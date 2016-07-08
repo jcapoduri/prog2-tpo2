@@ -6,8 +6,8 @@ uses
   oca.space in 'libs\oca.space.pas',
   oca.space.list in 'libs\oca.space.list.pas';
 
-var 
-  list : tListOcaSpace;
+var
+  game : oca.game.tOcaGame;
 
 begin
 

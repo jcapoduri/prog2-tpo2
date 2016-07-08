@@ -143,35 +143,69 @@ end;
 
 function  next (var this : tListOcaSpace; pos : idxRange) : idxRange;
 var
-  Rc : tControlRecord;
+  Rc   : tControlRecord
+  Ridx : tIdxRecord;
 begin
-  Rc    := getControlRecord(this);
-  //next  := Rc.first;
+  if pos = NULLIDX then
+    begin
+      Rc   := getControlRecord(this);
+      next := Rc.first;
+    end
+  else
+    begin
+      reset(this.control.indexes);
+      seek (this.control.indexes, pos);
+      next := pos.next;  
+    end;  
 end;
 
-function  search       (var this : tListOcaSpace; key : tKey; var pos : idxRange) : boolean;
+function  search (var this : tListOcaSpace; key : tKey; var pos : idxRange) : boolean;
 var
-  found: boolean;
+  found : boolean;
+  Rc    : tControlRecord;
+  Ridx  : tIdxRecord;  
 begin
+  found := false;
+  Rc    := getControlRecord(this.control.control);
+  pos   := NULLIDX;
+  if Rc.first <> Rc.last then
+    begin
+      reset(this.control.indexes);
+      seek(this.control.indexes, Rc.first);
+      read(this.control.indexes, Ridx);
+
+      if Ridx.key = key then
+        found := true
+      else
+        begin
+          pos := 
+        end;
+  while Ridx.next <> NULLIDX and Ridx.key< key do 
+  begin
+
+    seek(this.control.indexes, Ridx.next);
+    read(this.control.indexes, Ridx);
+  end;
+
   search := found;
 end;
 
-procedure insert       (var this : tListOcaSpace; item : tModel);
+procedure insert (var this : tListOcaSpace; item : tModel);
 begin
   
 end;
 
-procedure deletePos    (var this : tListOcaSpace; pos : idxRange);
+procedure deletePos (var this : tListOcaSpace; pos : idxRange);
 begin
   
 end;
 
-procedure deleteItem   (var this : tListOcaSpace; item : tModel);
+procedure deleteItem (var this : tListOcaSpace; item : tModel);
 begin
   
 end;
 
-function  isValidPos   (var this : tListOcaSpace; pos : idxRange) : Boolean;
+function  isValidPos (var this : tListOcaSpace; pos : idxRange) : Boolean;
 begin
   isValidPos := pos <> NULLIDX;
 end;
