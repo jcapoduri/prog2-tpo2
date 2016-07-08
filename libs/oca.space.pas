@@ -3,8 +3,9 @@ unit oca.space;
 interface
 
 type
+  tKey      = integer;
   tOcaSpace = record
-                number : Integer;                
+                number : tKey;
               end;
 
 implementation
