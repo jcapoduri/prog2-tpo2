@@ -3,7 +3,7 @@ unit oca.space.list;
 interface
 
 uses
-  oca.space in 'libs\oca.space.pas',
+  oca.space,
   sysutils;
 
 const
@@ -54,16 +54,16 @@ function getControlRecord(var this : tListOcaSpace) : tControlRecord;
 var 
   Rc : tControlRecord;
 begin
-  open(this.control.control);
-  seek(this.control.control, 0);
-  read(this.control.control, Rc);
+  reset(this.control.control);
+  seek (this.control.control, 0);
+  read (this.control.control, Rc);
   close(this.control.control);
   getControlRecord := Rc;
 end;
 
 procedure setControlRecord(var this : tListOcaSpace; Rc : tControlRecord);
 begin
-  append(this.control.control);
+  reset(this.control.control);
   seek (this.control.control, 0);
   write(this.control.control, Rc);
   close(this.control.control);
@@ -147,6 +147,33 @@ var
 begin
   Rc    := getControlRecord(this);
   //next  := Rc.first;
+end;
+
+function  search       (var this : tListOcaSpace; key : tKey; var pos : idxRange) : boolean;
+var
+  found: boolean;
+begin
+  search := found;
+end;
+
+procedure insert       (var this : tListOcaSpace; item : tModel);
+begin
+  
+end;
+
+procedure deletePos    (var this : tListOcaSpace; pos : idxRange);
+begin
+  
+end;
+
+procedure deleteItem   (var this : tListOcaSpace; item : tModel);
+begin
+  
+end;
+
+function  isValidPos   (var this : tListOcaSpace; pos : idxRange) : Boolean;
+begin
+  isValidPos := pos <> NULLIDX;
 end;
 
 end.
