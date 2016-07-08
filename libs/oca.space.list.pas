@@ -81,7 +81,7 @@ begin
   close(this.data);
 
   //check if data file exists
-  assign(this.data, fullFileName + '.ctrl');
+  assign(this.control, fullFileName + '.ctrl');
   if not fileexists(fullFileName + '.ctrl') then
     begin
       rewrite(this.control);
@@ -147,7 +147,7 @@ begin
   close (this.data);
 end;
 
-procedure append (var this : tListOcaSpace; var item : tOcaSpace);
+function append (var this : tListOcaSpace; var item : tOcaSpace) : idxRange;
 var
   Rc      : tControlRecord;
   pos     : idxRange;
@@ -156,7 +156,10 @@ begin
   Rc := getControlRecord(this);
   if Rc.erased = NULLIDX then
     begin
-      //item := get(this, )
+      reset(this.data);
+      seek (this.data, FileSize(this.data));
+      write(this.data, item);
+      close(this.data);
     end
   else
     begin
@@ -168,7 +171,7 @@ begin
 
       setControlRecord(this, Rc);
     end;
-
+  append := pos;
 end;
 
 function  next (var this : tListOcaSpace; pos : idxRange) : idxRange;
@@ -210,7 +213,7 @@ begin
           begin
             pos := Ridx;          
           end;
-      until found or Ridx = Rc.last or item.number > key;
+      until found or (Ridx = Rc.last) or (item.number > key);
     end;
   
   if found then pos := Ridx;
@@ -222,34 +225,40 @@ procedure insert (var this : tListOcaSpace; item : tOcaSpace);
 var
   pos, auxPos : idxRange;
   auxItem     : tOcaSpace;
-  Rc          : tControlRecord
+  Rc          : tControlRecord;
 begin
-  if not search(this, item, pos) then
-    begin      
-      auxPos  := append(this, item);
-      Rc      := getControlRecord(this);
+  Rc := getControlRecord(this);
+  if Rc.first = Rc.last then
+    begin
+      auxPos   := append(this, item);
+      Rc.first := auxPos;
+      Rc.last  := auxPos;
+      Rc.count := 1;
+      setControlRecord(this, Rc);
+    end
+  else  
+    if not search(this, item.number, pos) then
+      begin      
+        auxPos  := append(this, item);
 
-      if pos = NULLIDX then
-        begin          
+        if pos = NULLIDX then
           Rc.first := auxPos;
+
+        if pos = Rc.last then
           setControlRecord(this, Rc);
-        end;
 
-      if pos = Rc.last then
-        begin          
-          Rc.last := auxPos;
-          setControlRecord(this, Rc);
-        end;
+        auxItem := get(this, pos);
+        pos     := auxItem.next;
 
-      auxItem := get(this, pos);
-      pos     := auxItem.next;
+        auxItem.next := auxPos;
+        update(this, auxPos, auxItem);
 
-      auxItem.next := auxPos;
-      update(this, auxItem);
+        item.next := pos;
+        update(this, pos, item);   
 
-      item.next = pos;
-      update(this, item);      
-    end;
+        Rc.count := Rc.count + 1;
+        setControlRecord(this, Rc);   
+      end;
 end;
 
 procedure deletePos (var this : tListOcaSpace; pos : idxRange);

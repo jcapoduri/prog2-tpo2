@@ -10,5 +10,6 @@ var
   game : oca.game.tOcaGame;
 
 begin
-
+  oca.game.create(game);
+  oca.game.generate(game);
 end.
