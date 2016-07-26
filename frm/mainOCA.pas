@@ -13,7 +13,7 @@ type
     ocaGame : oca.game.tOcaGame
     procedure updateUI();
   public
-    contructor new (var game : oca.game.tOcaGame);
+    Constructor new (var game : oca.game.tOcaGame);
     
   end;
 
@@ -24,5 +24,12 @@ implementation
 
 {$R *.dfm}
 
+
+{ TForm1 }
+
+constructor TForm1.new(var game: tOcaGame);
+begin
+
+end;
 
 end.

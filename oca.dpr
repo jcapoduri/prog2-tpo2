@@ -3,13 +3,17 @@ program oca;
 uses
   sysutils,
   oca.game,
-  oca.space.list in 'libs\oca.space.list.pas',
-  mainOCA in 'frm\mainOCA.pas' {mainOCAWidget};
+  oca.space     in 'libs\oca.space.pas',
+  oca.movements in 'libs\oca.movements.pas',
+  oca.modifiers in 'libs\oca.modifiers.pas',
+  mainOCA       in 'frm\mainOCA.pas' {mainOCAWidget};
 
 var
   game : oca.game.tOcaGame;
+  ui   : mainOCA.TForm1
 
 begin
   oca.game.create(game);
   oca.game.generate(game);
+  ui = new TForm1(game);
 end.

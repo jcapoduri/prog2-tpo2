@@ -3,7 +3,9 @@ unit oca.game;
 interface
 
 uses
-  oca.space.list;
+  oca.space,
+  oca.movements,
+  oca.modifiers;
 
 CONST
   GAMEFILESNAME = 'ocasaves';
@@ -14,9 +16,9 @@ const
 
 type
   tOcaGame = record
-              path  : tListOcaSpace;
-              rules : integer;
-            end;
+               path  : tListOcaSpace;
+               rules : tStackOca;
+             end;
 
   procedure create   (var this : tOcaGame);
   procedure generate (var this : tOcaGame);
@@ -26,7 +28,7 @@ implementation
 
 procedure create   (var this : tOcaGame);
 begin
-  oca.space.list.newEmptyList(this.path, GAMEFILESPATH, GAMEFILESNAME);
+  oca.space.newEmptyList(this.path, GAMEFILESPATH, GAMEFILESNAME);
   //TO DO create rules
 end;
 
@@ -55,7 +57,7 @@ begin
   for i := 1 to NMBSPACES do
     begin
       item.number := spaces[i];
-      oca.space.list.insert(this.path, item);
+      oca.space.insert(this.path, item);
     end;
 end;
 
