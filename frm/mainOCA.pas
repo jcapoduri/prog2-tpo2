@@ -4,13 +4,14 @@ interface
 
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, Grids;
+  Dialogs, Grids,
+  oca.game;
 
 type
   TForm1 = class(TForm)
     StringGrid1: TStringGrid;
   protected
-    ocaGame : oca.game.tOcaGame
+    ocaGame : oca.game.tOcaGame;
     procedure updateUI();
   public
     Constructor new (var game : oca.game.tOcaGame);
@@ -28,6 +29,11 @@ implementation
 { TForm1 }
 
 constructor TForm1.new(var game: tOcaGame);
+begin
+
+end;
+
+procedure TForm1.updateUI;
 begin
 
 end;

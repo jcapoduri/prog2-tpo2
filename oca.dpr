@@ -10,10 +10,11 @@ uses
 
 var
   game : oca.game.tOcaGame;
-  ui   : mainOCA.TForm1
+  ui   : mainOCA.TForm1;
 
 begin
   oca.game.create(game);
   oca.game.generate(game);
-  ui = new TForm1(game);
+  ui := TForm1.new(game);
+  ui.Show;
 end.

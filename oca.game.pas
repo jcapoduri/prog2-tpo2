@@ -9,6 +9,8 @@ uses
 
 CONST
   GAMEFILESNAME = 'ocasaves';
+  GAMEFILESMVMT = 'ocamoves';
+  GAMEFILESRULE = 'ocarules';
   GAMEFILESPATH = 'games/';
 
 const
@@ -29,7 +31,7 @@ implementation
 procedure create   (var this : tOcaGame);
 begin
   oca.space.newEmptyList(this.path, GAMEFILESPATH, GAMEFILESNAME);
-  //TO DO create rules
+  oca.movements.newEmptyStack(this.rules, GAMEFILESPATH, GAMEFILESRULE);
 end;
 
 procedure generate (var this : tOcaGame);
