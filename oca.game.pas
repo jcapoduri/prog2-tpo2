@@ -3,31 +3,63 @@ unit oca.game;
 interface
 
 uses
-  oca.space.list;
+  oca.space,
+  oca.movements,
+  oca.modifiers;
 
 CONST
   GAMEFILESNAME = 'ocasaves';
+  GAMEFILESMVMT = 'ocamoves';
+  GAMEFILESRULE = 'ocarules';
   GAMEFILESPATH = 'games/';
 
 const
   NMBSPACES = 63;
 
 type
+  tOcaPlayerInfo = record
+                     looseTurns : integer;    
+                     overTurns  : integer;
+                     currentPos : integer;
+                   end;
   tOcaGame = record
-              path  : tListOcaSpace;
-              rules : integer;
-            end;
+               path        : tListOcaSpace;
+               rules       : tStackOca;
+               players     : array[1..4] of tOcaPlayerInfo;
+               playersNbr  : integer;
+               currentPlay : integer;
+             end;
 
-  procedure create   (var this : tOcaGame);
-  procedure generate (var this : tOcaGame);
-  procedure load     (var this : tOcaGame);
+  procedure create    (var this : tOcaGame);
+  procedure generate  (var this : tOcaGame);
+  procedure setupGame (var this : tOcaGame; players: integer);
+
+  procedure setCurrentPlayer  (var this : tOcaGame; player: integer);
+  function  currentPlayer     (var this : tOcaGame) : integer;
+  function  currentPlayerInfo (var this : tOcaGame) : tOcaPlayerInfo;
+  function  nextPlayer        (var this: tOcaGame) : integer;
 
 implementation
 
 procedure create   (var this : tOcaGame);
 begin
-  oca.space.list.newEmptyList(this.path, GAMEFILESPATH, GAMEFILESNAME);
-  //TO DO create rules
+  oca.space.newEmptyList(this.path, GAMEFILESPATH, GAMEFILESNAME);
+  oca.modifiers.newEmptyStack(this.rules, GAMEFILESPATH, GAMEFILESRULE);
+end;
+
+procedure setupGame (var this : tOcaGame; players: integer);
+var
+  i: Integer;
+begin
+  this.playersNbr := players;
+  for i := 1 to players do;
+    begin
+      this.players[i].looseTurns := 0;
+      this.players[i].overTurns  := 0;
+      this.players[i].currentPos := NULLIDX;
+    end;
+
+  this.currentPlay := 1;
 end;
 
 procedure generate (var this : tOcaGame);
@@ -55,14 +87,30 @@ begin
   for i := 1 to NMBSPACES do
     begin
       item.number := spaces[i];
-      oca.space.list.insert(this.path, item);
+      oca.space.insert(this.path, item);
     end;
 end;
 
-procedure load     (var this : tOcaGame);
+procedure setCurrentPlayer  (var this : tOcaGame; player: integer);
+begin
+  this.currentPlay := player;
+end;
+
+function  currentPlayer     (var this : tOcaGame) : integer;
+begin
+  currentPlayer := this.currentPlay;
+end;
+
+function  currentPlayerInfo (var this : tOcaGame) : tOcaPlayerInfo;
+begin
+  currentPlayerInfo := this.players[this.currentPlay];
+end;
+
+function  nextPlayer        (var this: tOcaGame) : integer;
+var
+  i: integer;
 begin
   
 end;
-
 
 end.
