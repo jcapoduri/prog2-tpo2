@@ -29,7 +29,7 @@ type
                    end;
 
 //(var this : tQueueOcaMvmt);
-  procedure newEmptyStack (var this : tQueueOcaMvmt; path, filename : string);
+  procedure newEmptyQueue (var this : tQueueOcaMvmt; path, filename : string);
   procedure insert        (var this : tQueueOcaMvmt; item : tOcaMovement);
   procedure deletePos     (var this : tQueueOcaMvmt; pos : idxRange);
   procedure deleteItem    (var this : tQueueOcaMvmt; item : tOcaMovement);
@@ -65,7 +65,7 @@ begin
   close(this.control);
 end;
 
-procedure newEmptyStack (var this : tQueueOcaMvmt; path, filename : string);
+procedure newEmptyQueue (var this : tQueueOcaMvmt; path, filename : string);
 var
   fullFileName : string;
   Rc           : tControlRecord;

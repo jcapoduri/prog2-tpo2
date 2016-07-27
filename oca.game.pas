@@ -22,13 +22,20 @@ type
                      overTurns  : integer;
                      currentPos : integer;
                    end;
-  tOcaGame = record
-               path        : tListOcaSpace;
-               rules       : tStackOca;
-               players     : array[1..4] of tOcaPlayerInfo;
-               playersNbr  : integer;
-               currentPlay : integer;
-             end;
+  tOcaGameData    = record
+                      path      : tListOcaSpace;
+                      rules     : tStackOca;
+                      movements : tQueueOcaMvmt;
+                    end;
+  tOcaGameControl = record
+                      players     : array[1..4] of tOcaPlayerInfo;
+                      playersNbr  : integer;
+                      currentPlay : integer;
+                    end;
+  tOcaGame        = record
+                      data        : tOcaGameData;
+                      control     : tOcaGameControl;
+                    end;
 
   procedure create    (var this : tOcaGame);
   procedure generate  (var this : tOcaGame);
@@ -43,23 +50,24 @@ implementation
 
 procedure create   (var this : tOcaGame);
 begin
-  oca.space.newEmptyList(this.path, GAMEFILESPATH, GAMEFILESNAME);
-  oca.modifiers.newEmptyStack(this.rules, GAMEFILESPATH, GAMEFILESRULE);
+  oca.space.newEmptyList(this.data.path, GAMEFILESPATH, GAMEFILESNAME);
+  oca.modifiers.newEmptyStack(this.data.rules, GAMEFILESPATH, GAMEFILESRULE);
+  oca.movements.newEmptyQueue(this.data.movements, GAMEFILESPATH, GAMEFILESMVMT)
 end;
 
 procedure setupGame (var this : tOcaGame; players: integer);
 var
   i: Integer;
 begin
-  this.playersNbr := players;
+  this.control.playersNbr := players;
   for i := 1 to players do;
     begin
-      this.players[i].looseTurns := 0;
-      this.players[i].overTurns  := 0;
-      this.players[i].currentPos := NULLIDX;
+      this.control.players[i].looseTurns := 0;
+      this.control.players[i].overTurns  := 0;
+      this.control.players[i].currentPos := NULLIDX;
     end;
 
-  this.currentPlay := 1;
+  this.control.currentPlay := 1;
 end;
 
 procedure generate (var this : tOcaGame);
@@ -87,23 +95,25 @@ begin
   for i := 1 to NMBSPACES do
     begin
       item.number := spaces[i];
-      oca.space.insert(this.path, item);
+      oca.space.insert(this.data.path, item);
     end;
+
+  //TODO: populate stack of fortune
 end;
 
 procedure setCurrentPlayer  (var this : tOcaGame; player: integer);
 begin
-  this.currentPlay := player;
+  this.control.currentPlay := player;
 end;
 
 function  currentPlayer     (var this : tOcaGame) : integer;
 begin
-  currentPlayer := this.currentPlay;
+  currentPlayer := this.control.currentPlay;
 end;
 
 function  currentPlayerInfo (var this : tOcaGame) : tOcaPlayerInfo;
 begin
-  currentPlayerInfo := this.players[this.currentPlay];
+  currentPlayerInfo := this.control.players[this.control.currentPlay];
 end;
 
 function  nextPlayer        (var this: tOcaGame) : integer;

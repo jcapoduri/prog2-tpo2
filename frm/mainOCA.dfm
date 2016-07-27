@@ -1,8 +1,8 @@
 object Form1: TForm1
   Left = 400
   Top = 237
-  Width = 764
-  Height = 549
+  Width = 760
+  Height = 552
   Caption = 'OCA'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -97,12 +97,13 @@ object Form1: TForm1
       TabOrder = 0
     end
   end
-  object quitButton: TButton
+  object BitBtn1: TBitBtn
     Left = 656
     Top = 480
     Width = 75
     Height = 25
-    Caption = 'Salir'
+    Caption = '&Salir'
     TabOrder = 3
+    Kind = bkClose
   end
 end
