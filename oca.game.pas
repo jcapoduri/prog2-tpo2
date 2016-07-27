@@ -31,7 +31,7 @@ implementation
 procedure create   (var this : tOcaGame);
 begin
   oca.space.newEmptyList(this.path, GAMEFILESPATH, GAMEFILESNAME);
-  oca.movements.newEmptyStack(this.rules, GAMEFILESPATH, GAMEFILESRULE);
+  oca.modifiers.newEmptyStack(this.rules, GAMEFILESPATH, GAMEFILESRULE);
 end;
 
 procedure generate (var this : tOcaGame);

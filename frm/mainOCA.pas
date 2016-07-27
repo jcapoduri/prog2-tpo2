@@ -14,8 +14,8 @@ type
     ocaGame : oca.game.tOcaGame;
     procedure updateUI();
   public
-    Constructor new (var game : oca.game.tOcaGame);
-    
+    Constructor new      (owner:  TComponent);
+    procedure   initGame (var game : oca.game.tOcaGame);
   end;
 
 var
@@ -28,9 +28,14 @@ implementation
 
 { TForm1 }
 
-constructor TForm1.new(var game: tOcaGame);
+procedure TForm1.initGame(var game: tOcaGame);
 begin
+     Self.ocaGame := game;
+end;
 
+constructor TForm1.new(owner:  TComponent);
+begin
+  inherited Create(owner);
 end;
 
 procedure TForm1.updateUI;

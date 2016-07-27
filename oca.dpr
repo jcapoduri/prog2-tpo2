@@ -2,6 +2,7 @@ program oca;
 
 uses
   sysutils,
+  Forms,
   oca.game,
   oca.space     in 'libs\oca.space.pas',
   oca.movements in 'libs\oca.movements.pas',
@@ -13,8 +14,10 @@ var
   ui   : mainOCA.TForm1;
 
 begin
+  Application.Initialize;
   oca.game.create(game);
   oca.game.generate(game);
-  ui := TForm1.new(game);
-  ui.Show;
+  Application.CreateForm(TForm1, ui);
+  ui.initGame(game);
+  Application.Run;
 end.
