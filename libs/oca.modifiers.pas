@@ -27,6 +27,7 @@ type
                      control : tControl;
                    end;
 
+  procedure loadStack        (var this : tStackOca; path, filename : string);
   procedure newEmptyStack    (var this : tStackOca; path, filename : string);
   procedure push             (var this : tStackOca; item : tOcaModifier);
   function  peek             (var this : tStackOca) : tOcaModifier;
@@ -58,7 +59,7 @@ begin
   close(this.control);
 end;
 
-procedure newEmptyStack (var this : tStackOca; path, filename : string);
+procedure loadStack (var this : tStackOca; path, filename : string);
 var
   fullFileName : string;
   Rc           : tControlRecord;
@@ -85,6 +86,28 @@ begin
     end
   else
     reset(this.control);
+  close(this.control);
+end;
+
+procedure newEmptyStack (var this : tStackOca; path, filename : string);
+var
+  fullFileName : string;
+  Rc           : tControlRecord;
+begin
+  fullFileName := path + filename;
+
+  //check if data file exists
+  assign(this.data, fullFileName + '.dat');
+  rewrite(this.data);
+  close(this.data);
+
+  //check if data file exists
+  assign(this.control, fullFileName + '.ctrl');
+  rewrite(this.control);
+  Rc.first  := NULLIDX;
+  Rc.erased := NULLIDX;
+  seek(this.control, 0);
+  write(this.control, Rc);
   close(this.control);
 end;
 

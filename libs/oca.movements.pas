@@ -29,6 +29,7 @@ type
                    end;
 
 //(var this : tQueueOcaMvmt);
+  procedure loadQueue     (var this : tQueueOcaMvmt; path, filename : string);
   procedure newEmptyQueue (var this : tQueueOcaMvmt; path, filename : string);
   procedure insert        (var this : tQueueOcaMvmt; item : tOcaMovement);
   procedure deletePos     (var this : tQueueOcaMvmt; pos : idxRange);
@@ -65,7 +66,7 @@ begin
   close(this.control);
 end;
 
-procedure newEmptyQueue (var this : tQueueOcaMvmt; path, filename : string);
+procedure loadQueue (var this : tQueueOcaMvmt; path, filename : string);
 var
   fullFileName : string;
   Rc           : tControlRecord;
@@ -94,6 +95,30 @@ begin
     end
   else
     reset(this.control);
+  close(this.control);
+end;
+
+procedure newEmptyQueue (var this : tQueueOcaMvmt; path, filename : string);
+var
+  fullFileName : string;
+  Rc           : tControlRecord;
+begin
+  fullFileName := path + filename;
+
+  //check if data file exists
+  assign(this.data, fullFileName + '.dat');
+  rewrite(this.data);
+  close(this.data);
+
+  //check if data file exists
+  assign(this.control, fullFileName + '.ctrl');
+  rewrite(this.control);
+  Rc.first  := NULLIDX;
+  Rc.last   := NULLIDX;
+  Rc.erased := NULLIDX;
+  Rc.count  := 0;
+  seek(this.control, 0);
+  write(this.control, Rc);
   close(this.control);
 end;
 

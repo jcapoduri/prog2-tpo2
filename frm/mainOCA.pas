@@ -83,9 +83,9 @@ var
   item     : tOcaCellInfo;
 begin
   total := oca.game.getTotalCells(Self.ocaGame);
-  for i := 1 to total do
+  for i := 0 to total - 1 do
     begin
-      item := oca.game.getCellInfo(Self.ocaGame, i);
+      item := oca.game.getCellInfo(Self.ocaGame, i + 1);
       Self.tableBoardGrid.Cells[i mod 8, i div 8] := IntToStr(item.cellNmb) 
     end;
 end;

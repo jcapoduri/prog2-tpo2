@@ -27,7 +27,7 @@ type
                      control : tControl;
                    end;
 
-//(var this : tListOcaSpace);
+  procedure loadList      (var this : tListOcaSpace; path, filename : string);
   procedure newEmptyList  (var this : tListOcaSpace; path, filename : string);
   procedure insert        (var this : tListOcaSpace; item : tOcaSpace);
   procedure deletePos     (var this : tListOcaSpace; pos : idxRange);
@@ -65,7 +65,7 @@ begin
   close(this.control);
 end;
 
-procedure newEmptyList (var this : tListOcaSpace; path, filename : string);
+procedure loadList (var this : tListOcaSpace; path, filename : string);
 var
   fullFileName : string;
   Rc           : tControlRecord;
@@ -94,6 +94,30 @@ begin
     end
   else
     reset(this.control);
+  close(this.control);
+end;
+
+procedure newEmptyList (var this : tListOcaSpace; path, filename : string);
+var
+  fullFileName : string;
+  Rc           : tControlRecord;
+begin
+  fullFileName := path + filename;
+
+  //check if data file exists
+  assign(this.data, fullFileName + '.dat');
+  rewrite(this.data);
+  close(this.data);
+
+  //check if data file exists
+  assign(this.control, fullFileName + '.ctrl');
+  rewrite(this.control);
+  Rc.first  := NULLIDX;
+  Rc.last   := NULLIDX;
+  Rc.erased := NULLIDX;
+  Rc.count  := 0;
+  seek(this.control, 0);
+  write(this.control, Rc);
   close(this.control);
 end;
 
