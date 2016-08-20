@@ -100,9 +100,68 @@ end;
 
 procedure generateBridges(var this : tOcaGame);
 var
-  item : tOcaModifier;
+  item1, item2    : tOcaModifier;
+  cell1, cell2    : integer;
+  bridgesInserted : boolean;
 begin
-  
+  bridgesInserted := false;
+  while not bridgesInserted do
+    begin
+      cell1 := random(NMBSPACES - 6);
+      cell2 := cell1 + 6;
+      if ( not oca.modifiers.existsCell(this.data.rules, cell1) ) and 
+         ( not oca.modifiers.existsCell(this.data.rules, cell2) ) then
+         begin
+           item1 := oca.modifiers.generateModifier(this.data.rules, Bridge, cell1); 
+           item2 := oca.modifiers.generateModifier(this.data.rules, Bridge, cell2); 
+           insertCell(this, item1);
+           insertCell(this, item2);
+           bridgesInserted := true;
+         end;
+    end;
+end;
+
+procedure generateDices(var this:tOcaGame);
+var
+  item1, item2        : tOcaModifier;
+  cell1, cell2, space : integer;
+  dicesInserted       : boolean;
+begin
+  dicesInserted := false;
+  while not dicesInserted do
+    begin
+      space := random(NMBSPACES - 20) + 20; //to have a random number upper than 20 but below NMBSPACES
+      cell1 := random(NMBSPACES - space);
+      cell2 := cell1 + space;
+      if ( not oca.modifiers.existsCell(this.data.rules, cell1) ) and 
+         ( not oca.modifiers.existsCell(this.data.rules, cell2) ) then
+         begin
+           item1 := oca.modifiers.generateModifier(this.data.rules, Dice, cell1); 
+           item2 := oca.modifiers.generateModifier(this.data.rules, Dice, cell2); 
+           insertCell(this, item1);
+           insertCell(this, item2);
+           dicesInserted := true;
+         end;
+    end;
+end;
+
+procedure generateRuleCell(var this:tOcaGame; modifier : tModifiers; lowerLimit : integer);
+var
+  item     : tOcaModifier;
+  cell     : integer;
+  inserted : boolean;
+begin
+  inserted := false;
+  while not inserted do
+    begin
+      cell := random(NMBSPACES - lowerLimit) + lowerLimit;
+      if not oca.modifiers.existsCell(this.data.rules, cell) then
+         begin
+           item := oca.modifiers.generateModifier(this.data.rules, modifier, cell); 
+           insertCell(this, item);
+           inserted := true;
+         end;
+    end;
 end;
 
 procedure generate (var this : tOcaGame);
@@ -135,6 +194,13 @@ begin
 
   //TODO: populate stack of fortune
   generateGooseCells(this);
+  generateBridges(this);
+  generateDices(this);
+  generateRuleCell(this, Inn, 0);
+  generateRuleCell(this, Prison, 0);
+  generateRuleCell(this, Pit, 0);
+  generateRuleCell(this, Labyrinth, NMBSPACES div 2);
+  generateRuleCell(this, Death, NMBSPACES div 2);
 end;
 
 function getCell (var this: tOcaGame; number: integer) : tOcaSpace;

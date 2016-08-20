@@ -10,7 +10,7 @@ const
 
 type
   idxRange       = NULLIDX..MAXINT;
-  tModifiers     = (Goose, Dice, Bridge, Prison, Inn, Pit, Labrynth, Death);
+  tModifiers     = (Goose, Dice, Bridge, Prison, Inn, Pit, Labyrinth, Death);
   tOcaModifier    = record
                      modifier : tModifiers;
                      cell     : integer;  
