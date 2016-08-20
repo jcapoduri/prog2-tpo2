@@ -157,7 +157,8 @@ begin
   if Rc.erased = NULLIDX then
     begin
       reset(this.data);
-      seek (this.data, FileSize(this.data));
+      pos := FileSize(this.data);
+      seek (this.data, pos);
       write(this.data, item);
       close(this.data);
     end
@@ -202,7 +203,7 @@ begin
   found := false;
   Rc    := getControlRecord(this);
   pos   := NULLIDX;
-  if Rc.first <> Rc.last then
+  if Rc.first <> NULLIDX then
     begin
       repeat
         Ridx := next(this, pos);
@@ -228,7 +229,7 @@ var
   Rc          : tControlRecord;
 begin
   Rc := getControlRecord(this);
-  if Rc.first = Rc.last then
+  if Rc.first = NULLIDX then
     begin
       auxPos   := append(this, item);
       Rc.first := auxPos;
@@ -254,7 +255,10 @@ begin
         update(this, auxPos, auxItem);
 
         item.next := pos;
-        update(this, pos, item);   
+        if pos = NULLIDX then
+          append(this, item)
+        else
+          update(this, pos, item);   
 
         Rc.count := Rc.count + 1;
         setControlRecord(this, Rc);   

@@ -17,10 +17,15 @@ const
   NMBSPACES = 63;
 
 type
+  tOcaCellInfo   = record
+                     cellNmb  : integer;
+                     player   : integer;
+                     modifier : tModifiers;
+                   end;
   tOcaPlayerInfo = record
-                     looseTurns : integer;    
-                     overTurns  : integer;
-                     currentPos : integer;
+                     looseTurns  : integer;    
+                     overTurns   : integer;
+                     currentCell : tOcaSpace;
                    end;
   tOcaGameData    = record
                       path      : tListOcaSpace;
@@ -46,7 +51,7 @@ type
   function  currentPlayer     (var this : tOcaGame) : integer;
   function  currentPlayerInfo (var this : tOcaGame) : tOcaPlayerInfo;
   function  nextPlayer        (var this: tOcaGame) : integer;
-  function  getCell           (var this: tOcaGame; number: integer) : tOcaSpace;
+  function  getCellInfo (var this: tOcaGame; number: integer) : tOcaCellInfo;
 
 implementation
 
@@ -59,14 +64,16 @@ end;
 
 procedure setupGame (var this : tOcaGame; players: integer);
 var
-  i: Integer;
+  i   : Integer;
+  idx : oca.space.idxRange;
 begin
   this.control.playersNbr := players;
   for i := 1 to players do;
     begin
       this.control.players[i].looseTurns := 0;
       this.control.players[i].overTurns  := 0;
-      this.control.players[i].currentPos := NULLIDX;
+      oca.space.search(this.data.path, 1, idx);
+      this.control.players[i].currentCell := oca.space.get(this.data.path, idx);
     end;
 
   this.control.currentPlay := 1;
@@ -203,9 +210,14 @@ begin
   generateRuleCell(this, Death, NMBSPACES div 2);
 end;
 
-function getCell (var this: tOcaGame; number: integer) : tOcaSpace;
+function getCellInfo (var this: tOcaGame; number: integer) : tOcaCellInfo;
+var 
+  item : tOcaCellInfo;
 begin
-  
+  item.player    := 0;
+  item.cellNmb   := number;
+  item.modifier  := None;
+  getCellInfo    := item
 end;
 
 procedure setCurrentPlayer  (var this : tOcaGame; player: integer);
@@ -226,6 +238,13 @@ end;
 function  currentPlayerInfo (var this : tOcaGame) : tOcaPlayerInfo;
 begin
   currentPlayerInfo := this.control.players[this.control.currentPlay];
+end;
+
+procedure movePlayer(var this : tOcaGame; player, movements : integer);
+var
+  i: Integer;
+begin
+  
 end;
 
 function  nextPlayer        (var this: tOcaGame) : integer;

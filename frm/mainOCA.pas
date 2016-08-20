@@ -79,9 +79,15 @@ end;
 
 procedure TForm1.renderMatrix;
 var
-  i: integer;
+  i, total : integer;
+  item     : tOcaCellInfo;
 begin
-  
+  total := oca.game.getTotalCells(Self.ocaGame);
+  for i := 1 to total do
+    begin
+      item := oca.game.getCellInfo(Self.ocaGame, i);
+      Self.tableBoardGrid.Cells[i mod 8, i div 8] := IntToStr(item.cellNmb) 
+    end;
 end;
 
 procedure TForm1.diceThrowEvent(Sender: TObject);
