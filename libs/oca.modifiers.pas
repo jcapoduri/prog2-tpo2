@@ -10,28 +10,31 @@ const
 
 type
   idxRange       = NULLIDX..MAXINT;
-  tKey           = integer;
-  tOcaModfier    = record
-                     number : tKey;
-                     next   : idxRange;
+  tModifiers     = (Goose, Dice, Bridge, Prison, Inn, Pit, Labrynth, Death);
+  tOcaModifier    = record
+                     modifier : tModifiers;
+                     cell     : integer;  
+                     next     : idxRange;
                    end;
   tControlRecord = record
                      first  : idxRange;
                      erased : idxRange;
                    end;
   tControl       = file of tControlRecord;
-  tData          = file of tOcaModfier;
+  tData          = file of tOcaModifier;
   tStackOca      = record
                      data    : tData;
                      control : tControl;
                    end;
 
-  procedure newEmptyStack (var this : tStackOca; path, filename : string);
-  procedure push          (var this : tStackOca; item : tOcaModfier);
-  function  peek          (var this : tStackOca) : tOcaModfier;
-  function  pop           (var this : tStackOca) : tOcaModfier;
-  function  isEmpty       (var this : tStackOca) : boolean;
-  function  search        (var this : tStackOca; key : tKey; var pos : idxRange) : boolean;
+  procedure newEmptyStack    (var this : tStackOca; path, filename : string);
+  procedure push             (var this : tStackOca; item : tOcaModifier);
+  function  peek             (var this : tStackOca) : tOcaModifier;
+  function  pop              (var this : tStackOca) : tOcaModifier;
+  function  isEmpty          (var this : tStackOca) : boolean;
+  function  search           (var this : tStackOca; key : tModifiers; var pos : idxRange) : boolean;
+  function  existsCell       (var this : tStackOca; cell: integer) : boolean;
+  function  generateModifier (var this : tStackOca;  modifier : tModifiers; cell: integer) : tOcaModifier;
 
 
 implementation
@@ -94,9 +97,9 @@ begin
 end;
 
 // inner function
-function  get (var this : tStackOca; pos : idxRange) : tOcaModfier;
+function  get (var this : tStackOca; pos : idxRange) : tOcaModifier;
 var
-  item: tOcaModfier;
+  item: tOcaModifier;
 begin
   reset (this.data);
   seek  (this.data, pos);
@@ -104,7 +107,7 @@ begin
   get := item;
 end;
 
-procedure update (var this : tStackOca; pos : idxRange; var item : tOcaModfier);
+procedure update (var this : tStackOca; pos : idxRange; var item : tOcaModifier);
 begin
   reset (this.data);
   seek  (this.data, pos);
@@ -112,11 +115,11 @@ begin
   close (this.data);
 end;
 
-function append (var this : tStackOca; var item : tOcaModfier) : idxRange;
+function append (var this : tStackOca; var item : tOcaModifier) : idxRange;
 var
   Rc      : tControlRecord;
   pos     : idxRange;
-  auxItem : tOcaModfier;
+  auxItem : tOcaModifier;
 begin
   Rc := getControlRecord(this);
   if Rc.erased = NULLIDX then
@@ -140,7 +143,7 @@ begin
 end;
 
 // public functions
-procedure push (var this : tStackOca; item : tOcaModfier);
+procedure push (var this : tStackOca; item : tOcaModifier);
 var
   auxPos : idxRange;
   Rc     : tControlRecord;
@@ -162,10 +165,10 @@ begin
     end;
 end;
 
-function  peek (var this : tStackOca) : tOcaModfier;
+function  peek (var this : tStackOca) : tOcaModifier;
 var
   pos, auxPos : idxRange;
-  auxItem     : tOcaModfier;
+  auxItem     : tOcaModifier;
   Rc          : tControlRecord;
 begin
   Rc := getControlRecord(this);
@@ -176,10 +179,10 @@ begin
   peek := auxItem;
 end;
 
-function  pop (var this : tStackOca) : tOcaModfier;
+function  pop (var this : tStackOca) : tOcaModifier;
 var
   pos, auxPos : idxRange;
-  auxItem     : tOcaModfier;
+  auxItem     : tOcaModifier;
   Rc          : tControlRecord;
 begin
   Rc := getControlRecord(this);
@@ -189,9 +192,35 @@ begin
     end;
 end;
 
-function  search (var this : tStackOca; key : tKey; var pos : idxRange) : boolean;
+function  search (var this : tStackOca; key : tModifiers; var pos : idxRange) : boolean;
 begin
   search := true
+end;
+
+function  existsCell (var this : tStackOca; cell: integer) : boolean;
+var
+  item: tOcaModifier;
+begin
+  if isEmpty(this) then
+    existsCell := false
+  else
+    begin
+      item := pop(this);
+      if (item.cell = cell) then
+        existsCell := true
+      else
+        existsCell := false;
+    end;
+end;
+
+function  generateModifier (var this : tStackOca;  modifier : tModifiers; cell: integer) : tOcaModifier;
+var 
+  item: tOcaModifier;
+begin
+  item.modifier    := modifier;
+  item.cell        := cell;
+  item.next        := NULLIDX;
+  generateModifier := item;
 end;
 
 end.

@@ -10,9 +10,9 @@ const
 
 type
   idxRange       = NULLIDX..MAXINT;
-  tKey           = integer;
   tOcaMovement   = record
-                     number : tKey;
+                     player : integer;
+                     dice   : integer;
                      next   : idxRange;
                    end;
   tControlRecord = record
@@ -21,7 +21,7 @@ type
                      erased : idxRange;
                      count  : integer;              
                    end;
-  tControl       =  file of tControlRecord;
+  tControl       = file of tControlRecord;
   tData          = file of tOcaMovement;
   tQueueOcaMvmt  = record
                      data    : tData;
@@ -40,7 +40,7 @@ type
   function  first         (var this : tQueueOcaMvmt) : idxRange;
   function  last          (var this : tQueueOcaMvmt) : idxRange;
   function  next          (var this : tQueueOcaMvmt; pos : idxRange) : idxRange;
-  function  search        (var this : tQueueOcaMvmt; key : tKey; var pos : idxRange) : boolean;
+  //function  search        (var this : tQueueOcaMvmt; key : tKey; var pos : idxRange) : boolean;
 
   function  isValidPos    (var this : tQueueOcaMvmt; pos : idxRange) : boolean;
 
@@ -192,7 +192,7 @@ begin
     end;  
 end;
 
-function  search (var this : tQueueOcaMvmt; key : tKey; var pos : idxRange) : boolean;
+{function  search (var this : tQueueOcaMvmt; key : tKey; var pos : idxRange) : boolean;
 var
   found : boolean;
   Rc    : tControlRecord;
@@ -219,7 +219,7 @@ begin
   if found then pos := Ridx;
 
   search := found;
-end;
+end;}
 
 procedure insert (var this : tQueueOcaMvmt; item : tOcaMovement);
 var
@@ -237,7 +237,7 @@ begin
       setControlRecord(this, Rc);
     end
   else  
-    if not search(this, item.number, pos) then
+    //if not search(this, item.number, pos) then
       begin      
         auxPos  := append(this, item);
 

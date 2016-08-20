@@ -42,9 +42,11 @@ type
   procedure setupGame (var this : tOcaGame; players: integer);
 
   procedure setCurrentPlayer  (var this : tOcaGame; player: integer);
+  function  getTotalCells     (var this : tOcaGame) : integer;
   function  currentPlayer     (var this : tOcaGame) : integer;
   function  currentPlayerInfo (var this : tOcaGame) : tOcaPlayerInfo;
   function  nextPlayer        (var this: tOcaGame) : integer;
+  function  getCell           (var this: tOcaGame; number: integer) : tOcaSpace;
 
 implementation
 
@@ -68,6 +70,39 @@ begin
     end;
 
   this.control.currentPlay := 1;
+end;
+
+function insertCell(var this: tOcaGame; item: tOcaModifier): Boolean;
+begin
+  if oca.modifiers.existsCell(this.data.rules, item.cell) then
+    insertCell := false
+  else
+    begin
+      oca.modifiers.push(this.data.rules, item);
+      insertCell := true;
+    end;
+end;
+
+procedure generateGooseCells (var this : tOcaGame);
+var 
+  gooseCells, i : integer;
+  cellNumber    : integer;
+  item          : tOcaModifier;
+begin
+  gooseCells := (NMBSPACES div 2) - 1;
+  for i:= 0 to gooseCells do
+    begin
+      cellNumber := Random(gooseCells) + (i * gooseCells);
+      item       := oca.modifiers.generateModifier(this.data.rules, Goose, cellNumber);
+      insertCell(this, item);
+    end;
+end;
+
+procedure generateBridges(var this : tOcaGame);
+var
+  item : tOcaModifier;
+begin
+  
 end;
 
 procedure generate (var this : tOcaGame);
@@ -94,16 +129,27 @@ begin
   //load random array into path
   for i := 1 to NMBSPACES do
     begin
-      item.number := spaces[i];
+      item := oca.space.generateSpace(this.data.path, spaces[i]);
       oca.space.insert(this.data.path, item);
     end;
 
   //TODO: populate stack of fortune
+  generateGooseCells(this);
+end;
+
+function getCell (var this: tOcaGame; number: integer) : tOcaSpace;
+begin
+  
 end;
 
 procedure setCurrentPlayer  (var this : tOcaGame; player: integer);
 begin
   this.control.currentPlay := player;
+end;
+
+function getTotalCells (var this : tOcaGame) : integer;
+begin
+  getTotalCells := NMBSPACES;
 end;
 
 function  currentPlayer     (var this : tOcaGame) : integer;
@@ -120,7 +166,7 @@ function  nextPlayer        (var this: tOcaGame) : integer;
 var
   i: integer;
 begin
-  
+
 end;
 
 end.

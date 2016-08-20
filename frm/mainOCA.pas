@@ -19,7 +19,14 @@ type
     Label3: TLabel;
     Button3: TButton;
     BitBtn1: TBitBtn;
+    playerLabel: TLabel;
+    diceEdit: TEdit;
+    diceThrowButton: TButton;
+    Label4: TLabel;
+    infoLabel: TLabel;
+    nextTurnButton: TButton;
     procedure startButtonClick(Sender: TObject);
+    procedure diceThrowEvent(Sender: TObject);
   protected
     ocaGame : oca.game.tOcaGame;
     procedure updateUI();
@@ -34,6 +41,8 @@ var
 
 implementation
 
+uses Math;
+
 {$R *.dfm}
 
 
@@ -47,11 +56,12 @@ end;
 constructor TForm1.new(owner:  TComponent);
 begin
   inherited Create(owner);
+  Randomize;
 end;
 
 procedure TForm1.updateUI;
 begin
-
+  Self.renderMatrix();
 end;
 
 procedure TForm1.startButtonClick(Sender: TObject);
@@ -71,7 +81,19 @@ procedure TForm1.renderMatrix;
 var
   i: integer;
 begin
+  
+end;
 
+procedure TForm1.diceThrowEvent(Sender: TObject);
+var
+  dice : integer;
+begin
+  dice := StrToIntDef(Self.diceEdit.Text, 0);
+  if ((dice < 1) or (dice > 6)) then
+     begin
+       dice := RandomRange(1, 6);
+       Self.diceEdit.Text := IntToStr(dice);
+     end;
 end;
 
 end.
