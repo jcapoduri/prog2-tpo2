@@ -33,7 +33,7 @@ type
   function  peek             (var this : tStackOca) : tOcaModifier;
   function  pop              (var this : tStackOca) : tOcaModifier;
   function  isEmpty          (var this : tStackOca) : boolean;
-  function  search           (var this : tStackOca; key : tModifiers; var pos : idxRange) : boolean;
+  function  search           (var this : tStackOca; cell : integer; var pos : idxRange) : boolean;
   function  existsCell       (var this : tStackOca; cell: integer) : boolean;
   function  generateModifier (var this : tStackOca;  modifier : tModifiers; cell: integer) : tOcaModifier;
 
@@ -215,9 +215,24 @@ begin
     end;
 end;
 
-function  search (var this : tStackOca; key : tModifiers; var pos : idxRange) : boolean;
+function  search (var this : tStackOca; cell : integer; var modifier : tModifiers) : boolean;
+var
+  item : tOcaModifier;
 begin
-  search := true
+  modifier := None;
+  item := pop(this);
+  if item.cell = cell then
+    begin
+      search := true;
+      modifier := item.modifier;
+    end
+  else
+    if isEmpty(this) then
+      search := false
+    else
+      search := search(this, cell, pod);
+
+  push(this, item);
 end;
 
 function  existsCell (var this : tStackOca; cell: integer) : boolean;
