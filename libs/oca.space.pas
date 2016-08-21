@@ -10,10 +10,9 @@ const
 
 type
   idxRange       = NULLIDX..MAXINT;
-  tKey           = integer;
   tOcaSpace      = record
-                     number : tKey;
-                     next   : idxRange;
+                     cell     : integer;  
+                     next     : idxRange;
                    end;
   tControlRecord = record
                      first  : idxRange;
@@ -21,28 +20,29 @@ type
                      erased : idxRange;
                      count  : integer;              
                    end;
-  tControl       =  file of tControlRecord;
+  tControl       = file of tControlRecord;
   tData          = file of tOcaSpace;
   tListOcaSpace  = record
                      data    : tData;
                      control : tControl;
                    end;
 
-//(var this : tListOcaSpace);
-  procedure newEmptyList (var this : tListOcaSpace; path, filename : string);
-  procedure insert       (var this : tListOcaSpace; item : tOcaSpace);
-  procedure deletePos    (var this : tListOcaSpace; pos : idxRange);
-  procedure deleteItem   (var this : tListOcaSpace; item : tOcaSpace);
+  procedure loadList      (var this : tListOcaSpace; path, filename : string);
+  procedure newEmptyList  (var this : tListOcaSpace; path, filename : string);
+  procedure insert        (var this : tListOcaSpace; item : tOcaSpace);
+  procedure deletePos     (var this : tListOcaSpace; pos : idxRange);
+  procedure deleteItem    (var this : tListOcaSpace; item : tOcaSpace);
 
-  function  get          (var this : tListOcaSpace; pos : idxRange) : tOcaSpace;
-  function  isEmpty      (var this : tListOcaSpace) : boolean;
-  function  length       (var this : tListOcaSpace) : integer;
-  function  first        (var this : tListOcaSpace) : idxRange;
-  function  last         (var this : tListOcaSpace) : idxRange;
-  function  next         (var this : tListOcaSpace; pos : idxRange) : idxRange;
-  function  search       (var this : tListOcaSpace; key : tKey; var pos : idxRange) : boolean;
+  function  get           (var this : tListOcaSpace; pos : idxRange) : tOcaSpace;
+  function  isEmpty       (var this : tListOcaSpace) : boolean;
+  function  length        (var this : tListOcaSpace) : integer;
+  function  first         (var this : tListOcaSpace) : idxRange;
+  function  last          (var this : tListOcaSpace) : idxRange;
+  function  next          (var this : tListOcaSpace; pos : idxRange) : idxRange;
+  function  search        (var this : tListOcaSpace; cell : integer; var pos : idxRange) : boolean;
 
-  function  isValidPos   (var this : tListOcaSpace; pos : idxRange) : boolean;
+  function  isValidPos    (var this : tListOcaSpace; pos : idxRange) : boolean;
+  function  generateSpace (var this : tListOcaSpace; cell: integer): tOcaSpace;
 
 implementation
 
@@ -65,7 +65,7 @@ begin
   close(this.control);
 end;
 
-procedure newEmptyList (var this : tListOcaSpace; path, filename : string);
+procedure loadList (var this : tListOcaSpace; path, filename : string);
 var
   fullFileName : string;
   Rc           : tControlRecord;
@@ -94,6 +94,30 @@ begin
     end
   else
     reset(this.control);
+  close(this.control);
+end;
+
+procedure newEmptyList (var this : tListOcaSpace; path, filename : string);
+var
+  fullFileName : string;
+  Rc           : tControlRecord;
+begin
+  fullFileName := path + filename;
+
+  //check if data file exists
+  assign(this.data, fullFileName + '.dat');
+  rewrite(this.data);
+  close(this.data);
+
+  //check if data file exists
+  assign(this.control, fullFileName + '.ctrl');
+  rewrite(this.control);
+  Rc.first  := NULLIDX;
+  Rc.last   := NULLIDX;
+  Rc.erased := NULLIDX;
+  Rc.count  := 0;
+  seek(this.control, 0);
+  write(this.control, Rc);
   close(this.control);
 end;
 
@@ -157,7 +181,8 @@ begin
   if Rc.erased = NULLIDX then
     begin
       reset(this.data);
-      seek (this.data, FileSize(this.data));
+      pos := FileSize(this.data);
+      seek (this.data, pos);
       write(this.data, item);
       close(this.data);
     end
@@ -192,7 +217,7 @@ begin
     end;  
 end;
 
-function  search (var this : tListOcaSpace; key : tKey; var pos : idxRange) : boolean;
+function search (var this : tListOcaSpace; cell : integer; var pos : idxRange) : boolean;
 var
   found : boolean;
   Rc    : tControlRecord;
@@ -202,18 +227,18 @@ begin
   found := false;
   Rc    := getControlRecord(this);
   pos   := NULLIDX;
-  if Rc.first <> Rc.last then
+  if Rc.first <> NULLIDX then
     begin
       repeat
         Ridx := next(this, pos);
         item := get(this, Ridx);
-        if item.number = key then
+        if item.cell = cell then
           found := true
         else
           begin
             pos := Ridx;          
           end;
-      until found or (Ridx = Rc.last) or (item.number > key);
+      until found or (Ridx = Rc.last) or (item.cell > cell);
     end;
   
   if found then pos := Ridx;
@@ -228,7 +253,7 @@ var
   Rc          : tControlRecord;
 begin
   Rc := getControlRecord(this);
-  if Rc.first = Rc.last then
+  if Rc.first = NULLIDX then
     begin
       auxPos   := append(this, item);
       Rc.first := auxPos;
@@ -237,7 +262,7 @@ begin
       setControlRecord(this, Rc);
     end
   else  
-    if not search(this, item.number, pos) then
+    if not search(this, item.cell, pos) then
       begin      
         auxPos  := append(this, item);
 
@@ -254,11 +279,23 @@ begin
         update(this, auxPos, auxItem);
 
         item.next := pos;
-        update(this, pos, item);   
+        if pos = NULLIDX then
+          append(this, item)
+        else
+          update(this, pos, item);   
 
         Rc.count := Rc.count + 1;
         setControlRecord(this, Rc);   
       end;
+end;
+
+function  generateSpace (var this : tListOcaSpace; cell : integer): tOcaSpace;
+var 
+  item: tOcaSpace;
+begin
+  item.cell     := cell;
+  item.next     := NULLIDX;
+  generateSpace := item;
 end;
 
 procedure deletePos (var this : tListOcaSpace; pos : idxRange);

@@ -1,8 +1,8 @@
 object Form1: TForm1
   Left = 400
   Top = 237
-  Width = 764
-  Height = 549
+  Width = 760
+  Height = 552
   Caption = 'OCA'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -82,11 +82,31 @@ object Form1: TForm1
       Caption = 'Jugador Actual:'
     end
     object Label3: TLabel
-      Left = 8
+      Left = 48
       Top = 56
       Width = 34
       Height = 13
       Caption = 'Tirada:'
+    end
+    object playerLabel: TLabel
+      Left = 88
+      Top = 24
+      Width = 3
+      Height = 13
+    end
+    object Label4: TLabel
+      Left = 56
+      Top = 96
+      Width = 24
+      Height = 13
+      Caption = 'Info:'
+    end
+    object infoLabel: TLabel
+      Left = 88
+      Top = 96
+      Width = 90
+      Height = 13
+      Caption = '                              '
     end
     object Button3: TButton
       Left = 104
@@ -96,13 +116,38 @@ object Form1: TForm1
       Caption = 'Replicar Juego actual'
       TabOrder = 0
     end
+    object diceEdit: TEdit
+      Left = 88
+      Top = 56
+      Width = 33
+      Height = 21
+      TabOrder = 1
+    end
+    object diceThrowButton: TButton
+      Left = 136
+      Top = 56
+      Width = 75
+      Height = 25
+      Caption = 'Tirar'
+      TabOrder = 2
+      OnClick = diceThrowEvent
+    end
+    object nextTurnButton: TButton
+      Left = 88
+      Top = 160
+      Width = 121
+      Height = 25
+      Caption = 'Sigiente Turno'
+      TabOrder = 3
+    end
   end
-  object quitButton: TButton
+  object BitBtn1: TBitBtn
     Left = 656
     Top = 480
     Width = 75
     Height = 25
-    Caption = 'Salir'
+    Caption = '&Salir'
     TabOrder = 3
+    Kind = bkClose
   end
 end

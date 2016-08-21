@@ -115,3 +115,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+bin
+bin/
+bin/games
+bin/games/

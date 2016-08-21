@@ -10,9 +10,9 @@ const
 
 type
   idxRange       = NULLIDX..MAXINT;
-  tKey           = integer;
   tOcaMovement   = record
-                     number : tKey;
+                     player : integer;
+                     dice   : integer;
                      next   : idxRange;
                    end;
   tControlRecord = record
@@ -21,7 +21,7 @@ type
                      erased : idxRange;
                      count  : integer;              
                    end;
-  tControl       =  file of tControlRecord;
+  tControl       = file of tControlRecord;
   tData          = file of tOcaMovement;
   tQueueOcaMvmt  = record
                      data    : tData;
@@ -29,7 +29,8 @@ type
                    end;
 
 //(var this : tQueueOcaMvmt);
-  procedure newEmptyStack (var this : tQueueOcaMvmt; path, filename : string);
+  procedure loadQueue     (var this : tQueueOcaMvmt; path, filename : string);
+  procedure newEmptyQueue (var this : tQueueOcaMvmt; path, filename : string);
   procedure insert        (var this : tQueueOcaMvmt; item : tOcaMovement);
   procedure deletePos     (var this : tQueueOcaMvmt; pos : idxRange);
   procedure deleteItem    (var this : tQueueOcaMvmt; item : tOcaMovement);
@@ -40,7 +41,7 @@ type
   function  first         (var this : tQueueOcaMvmt) : idxRange;
   function  last          (var this : tQueueOcaMvmt) : idxRange;
   function  next          (var this : tQueueOcaMvmt; pos : idxRange) : idxRange;
-  function  search        (var this : tQueueOcaMvmt; key : tKey; var pos : idxRange) : boolean;
+  //function  search        (var this : tQueueOcaMvmt; key : tKey; var pos : idxRange) : boolean;
 
   function  isValidPos    (var this : tQueueOcaMvmt; pos : idxRange) : boolean;
 
@@ -65,7 +66,7 @@ begin
   close(this.control);
 end;
 
-procedure newEmptyStack (var this : tQueueOcaMvmt; path, filename : string);
+procedure loadQueue (var this : tQueueOcaMvmt; path, filename : string);
 var
   fullFileName : string;
   Rc           : tControlRecord;
@@ -94,6 +95,30 @@ begin
     end
   else
     reset(this.control);
+  close(this.control);
+end;
+
+procedure newEmptyQueue (var this : tQueueOcaMvmt; path, filename : string);
+var
+  fullFileName : string;
+  Rc           : tControlRecord;
+begin
+  fullFileName := path + filename;
+
+  //check if data file exists
+  assign(this.data, fullFileName + '.dat');
+  rewrite(this.data);
+  close(this.data);
+
+  //check if data file exists
+  assign(this.control, fullFileName + '.ctrl');
+  rewrite(this.control);
+  Rc.first  := NULLIDX;
+  Rc.last   := NULLIDX;
+  Rc.erased := NULLIDX;
+  Rc.count  := 0;
+  seek(this.control, 0);
+  write(this.control, Rc);
   close(this.control);
 end;
 
@@ -192,7 +217,7 @@ begin
     end;  
 end;
 
-function  search (var this : tQueueOcaMvmt; key : tKey; var pos : idxRange) : boolean;
+{function  search (var this : tQueueOcaMvmt; key : tKey; var pos : idxRange) : boolean;
 var
   found : boolean;
   Rc    : tControlRecord;
@@ -219,7 +244,7 @@ begin
   if found then pos := Ridx;
 
   search := found;
-end;
+end;}
 
 procedure insert (var this : tQueueOcaMvmt; item : tOcaMovement);
 var
@@ -237,7 +262,7 @@ begin
       setControlRecord(this, Rc);
     end
   else  
-    if not search(this, item.number, pos) then
+    //if not search(this, item.number, pos) then
       begin      
         auxPos  := append(this, item);
 
