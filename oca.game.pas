@@ -19,7 +19,7 @@ const
 type
   tOcaCellInfo   = record
                      cellNmb  : integer;
-                     player   : integer;
+                     players  : array [1..4] of boolean;
                      modifier : tModifiers;
                    end;
   tOcaPlayerInfo = record
@@ -55,7 +55,7 @@ type
 
 implementation
 
-procedure create   (var this : tOcaGame);
+procedure create (var this : tOcaGame);
 begin
   oca.space.newEmptyList(this.data.path, GAMEFILESPATH, GAMEFILESNAME);
   oca.modifiers.newEmptyStack(this.data.rules, GAMEFILESPATH, GAMEFILESRULE);
@@ -212,11 +212,29 @@ end;
 
 function getCellInfo (var this: tOcaGame; number: integer) : tOcaCellInfo;
 var 
-  item : tOcaCellInfo;
+  item     : tOcaCellInfo;
+  player   : tOcaPlayerInfo;
+  modifier : tModifiers;
 begin
-  item.player    := 0;
-  item.cellNmb   := number;
-  item.modifier  := None;
+  item.players[1] := false;
+  item.players[2] := false;
+  item.players[3] := false;
+  item.players[4] := false;
+  item.cellNmb    := number;
+  item.modifier   := None;
+
+  //update player info
+  for i := 1 to this.control.playersNbr do
+    begin
+      player := this.control.players[i];
+      if player.currentCell.cell = number then
+        item.players[i] := true;
+    end;
+
+  //update tile info
+  if oca.modifiers.search(this.data.rules, number, modifier) then
+    item.modifier := modifier;
+
   getCellInfo    := item
 end;
 
@@ -240,9 +258,14 @@ begin
   currentPlayerInfo := this.control.players[this.control.currentPlay];
 end;
 
-procedure movePlayer(var this : tOcaGame; player, movements : integer);
+procedure movePlayer (var this : tOcaGame; player, movements : integer);
 var
   i: Integer;
+begin
+  
+end;
+
+procedure playerReactToCell (var this : tOcaGame; player : integer);
 begin
   
 end;
