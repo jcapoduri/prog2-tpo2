@@ -33,12 +33,14 @@ type
   function  peek             (var this : tStackOca) : tOcaModifier;
   function  pop              (var this : tStackOca) : tOcaModifier;
   function  isEmpty          (var this : tStackOca) : boolean;
-  function  search           (var this : tStackOca; cell : integer; var pos : idxRange) : boolean;
+  function  search           (var this : tStackOca; cell : integer; var modifier : tModifiers) : boolean;
   function  existsCell       (var this : tStackOca; cell: integer) : boolean;
   function  generateModifier (var this : tStackOca;  modifier : tModifiers; cell: integer) : tOcaModifier;
 
 
 implementation
+
+uses oca.modifiers;
 
 function getControlRecord(var this : tStackOca) : tControlRecord;
 var 
@@ -211,7 +213,9 @@ begin
   Rc := getControlRecord(this);
   if not (Rc.first = NULLIDX) then
     begin
-      
+      auxItem  := get(this, Rc.first);
+      Rc.first := auxItem.next;
+      setControlRecord(this, Rc);
     end;
 end;
 
@@ -230,7 +234,7 @@ begin
     if isEmpty(this) then
       search := false
     else
-      search := search(this, cell, pod);
+      search := search(this, cell, modifier);
 
   push(this, item);
 end;

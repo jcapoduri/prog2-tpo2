@@ -211,7 +211,8 @@ begin
 end;
 
 function getCellInfo (var this: tOcaGame; number: integer) : tOcaCellInfo;
-var 
+var
+  i        : integer;
   item     : tOcaCellInfo;
   player   : tOcaPlayerInfo;
   modifier : tModifiers;
@@ -236,6 +237,59 @@ begin
     item.modifier := modifier;
 
   getCellInfo    := item
+end;
+
+
+// retrieves the next tOcaSpace with the same modifier that item AFTER the item itself from the stack
+function retrieveNextItemNotThisOne (var this : tOcaGame; item : tOcaSpace; var resultItem : tOcaSpace) : boolean;
+var
+  keepLooping : boolean;
+  keepLooking : boolean;
+  found       : boolean;
+  currItem    : tOcaModifier;
+  modifier    : tModifiers;
+  tempStack   : tStackOca;
+  pos         : oca.space.idxRange;
+begin
+  oca.modifiers.newEmptyStack(tempStack, GAMEFILESPATH, GAMEFILESRULE + '.tmp');
+  keepLooping := not oca.modifiers.isEmpty(this.data.rules);
+  keepLooking := true;
+  found       := false;
+
+  // loop until find the item
+  while keepLooping and not found do
+    begin
+      currItem    := oca.modifiers.pop(this.data.rules);
+      keepLooping := not oca.modifiers.isEmpty(this.data.rules);
+      if keepLooking then
+        if currItem.cell = item.cell then 
+          begin
+            keepLooking := false;
+            modifier    := currItem.modifier;
+          end
+      else
+          if currItem.modifier = modifier then
+            found       := true;
+      oca.modifiers.push(tempStack, currItem);
+    end;
+
+  //update the result
+  if found then
+    begin
+      found  := oca.space.search(this.data.path, currItem.cell, pos);
+      result := oca.space.get(this.data.path, pos);
+    end;
+  
+  // move all items into the rules stack
+  while not oca.modifiers.isEmpty(tempStack) do
+    oca.modifiers.push(this.data.rules, pop(tempStack));
+
+  retrieveNextItemNotThisOne := found;
+end;
+
+procedure reactToGoose (var this : tOcaGame; player: integer);
+begin
+  
 end;
 
 procedure setCurrentPlayer  (var this : tOcaGame; player: integer);
