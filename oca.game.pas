@@ -276,8 +276,8 @@ begin
   //update the result
   if found then
     begin
-      found  := oca.space.search(this.data.path, currItem.cell, pos);
-      result := oca.space.get(this.data.path, pos);
+      found      := oca.space.search(this.data.path, currItem.cell, pos);
+      resultItem := oca.space.get(this.data.path, pos);
     end;
   
   // move all items into the rules stack
