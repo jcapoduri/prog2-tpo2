@@ -40,8 +40,6 @@ type
 
 implementation
 
-uses oca.modifiers;
-
 function getControlRecord(var this : tStackOca) : tControlRecord;
 var 
   Rc : tControlRecord;
