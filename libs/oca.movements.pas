@@ -35,6 +35,10 @@ type
   procedure deletePos     (var this : tQueueOcaMvmt; pos : idxRange);
   procedure deleteItem    (var this : tQueueOcaMvmt; item : tOcaMovement);
 
+  procedure queue         (var this : tQueueOcaMvmt; item : tOcaMovement);
+  function  dequeue       (var this : tQueueOcaMvmt) : tOcaMovement;
+  function  createMovement(var this : tQueueOcaMvmt; player, movement : integer) : tOcaMovement;
+
   function  get           (var this : tQueueOcaMvmt; pos : idxRange) : tOcaMovement;
   function  isEmpty       (var this : tQueueOcaMvmt) : boolean;
   function  length        (var this : tQueueOcaMvmt) : integer;
@@ -271,6 +275,67 @@ end;
 function  isValidPos (var this : tQueueOcaMvmt; pos : idxRange) : Boolean;
 begin
   isValidPos := pos <> NULLIDX;
+end;
+
+procedure queue         (var this : tQueueOcaMvmt; item : tOcaMovement);
+var
+  Rc      : tControlRecord;
+  itemPos : idxRange;
+  auxItem : tOcaMovement;
+  auxPos  : idxRange;
+begin
+  itemPos := append(this, item);
+  Rc      := getControlRecord(this);
+  if Rc.first = NULLIDX then
+    begin
+      Rc.first := itemPos;
+      Rc.last  := itemPos;
+    end
+  else
+    begin
+      auxPos  := Rc.last;
+      auxItem := get(this, auxPos);
+      auxItem.next := itemPos;
+      update(this, auxPos, item);
+      Rc.last := itemPos;
+    end;
+  setControlRecord(this, Rc);
+end;
+
+
+function  dequeue (var this : tQueueOcaMvmt) : tOcaMovement;
+var
+  Rc      : tControlRecord;
+  itemPos : idxRange;
+  auxItem : tOcaMovement;
+  auxPos  : idxRange;
+begin
+  Rc      := getControlRecord(this);
+  auxPos  := Rc.first;
+  auxItem := get(this, auxPos);
+
+
+  Rc.first := auxItem.next;
+  auxItem.next := Rc.erased;
+  auxItem.next := auxPos;
+
+
+  update(this, auxPos, auxItem);
+  setControlRecord(this, Rc);
+
+
+  auxItem.next := NULLIDX;
+  dequeue := auxItem;
+end;
+
+function  createMovement(var this : tQueueOcaMvmt; player, movement : integer) : tOcaMovement;
+var
+  item : tOcaMovement;
+begin
+  item.player    := player;
+  item.dice      := movement;
+  item.next      := NULLIDX;
+  createMovement := item;
 end;
 
 end.

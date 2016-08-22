@@ -53,6 +53,8 @@ type
   function  nextPlayer        (var this: tOcaGame) : integer;
   function  getCellInfo (var this: tOcaGame; number: integer) : tOcaCellInfo;
 
+  procedure movePlayer  (var this : tOcaGame; player, movements : integer);
+
 implementation
 
 procedure create (var this : tOcaGame);
@@ -314,9 +316,10 @@ end;
 
 procedure movePlayer (var this : tOcaGame; player, movements : integer);
 var
-  i: Integer;
+item : tOcaMovement;
 begin
-
+  item := oca.movements.createMovement(this.data.movements, player, movements);
+  oca.movements.queue(this.data.movements, item);
 end;
 
 procedure playerReactToCell (var this : tOcaGame; player : integer);
@@ -328,7 +331,6 @@ function  nextPlayer        (var this: tOcaGame) : integer;
 var
   i: integer;
 begin
-
 end;
 
 end.
