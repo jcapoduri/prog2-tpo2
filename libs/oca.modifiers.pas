@@ -13,7 +13,7 @@ type
   tModifiers     = (None, Goose, Dice, Bridge, Prison, Inn, Pit, Labyrinth, Death);
   tOcaModifier    = record
                      modifier : tModifiers;
-                     cell     : integer;  
+                     cell     : integer;
                      next     : idxRange;
                    end;
   tControlRecord = record
@@ -41,7 +41,7 @@ type
 implementation
 
 function getControlRecord(var this : tStackOca) : tControlRecord;
-var 
+var
   Rc : tControlRecord;
 begin
   reset(this.control);
@@ -144,11 +144,13 @@ var
   pos     : idxRange;
   auxItem : tOcaModifier;
 begin
-  Rc := getControlRecord(this);
+  Rc  := getControlRecord(this);
+  pos := NULLIDX;
   if Rc.erased = NULLIDX then
     begin
       reset(this.data);
-      seek (this.data, FileSize(this.data));
+      pos := filesize(this.data);
+      seek(this.data, pos);
       write(this.data, item);
       close(this.data);
     end
@@ -158,7 +160,7 @@ begin
       auxItem   := get(this, Rc.erased);
       Rc.erased := auxItem.next;
 
-      update(this, pos, item);      
+      update(this, pos, item);
 
       setControlRecord(this, Rc);
     end;
@@ -174,17 +176,18 @@ begin
   Rc := getControlRecord(this);
   if Rc.first = NULLIDX then
     begin
-      auxPos   := append(this, item);
-      Rc.first := auxPos;
+      Rc.first := append(this, item);
+      item.next := NULLIDX;
       setControlRecord(this, Rc);
+      update(this, Rc.first, item);
     end
-  else  
-    begin      
+  else
+    begin
       auxPos      := append(this, item);
       item.next   := Rc.first;
-      Rc.first    := auxPos; 
+      Rc.first    := auxPos;
       update(this, auxPos, item);
-      setControlRecord(this, Rc);   
+      setControlRecord(this, Rc);
     end;
 end;
 
@@ -197,8 +200,8 @@ begin
   Rc := getControlRecord(this);
   if not (Rc.first = NULLIDX) then
     begin
-      auxItem := get(this, Rc.first); 
-    end; 
+      auxItem := get(this, Rc.first);
+    end;
   peek := auxItem;
 end;
 
@@ -211,9 +214,15 @@ begin
   Rc := getControlRecord(this);
   if not (Rc.first = NULLIDX) then
     begin
-      auxItem  := get(this, Rc.first);
-      Rc.first := auxItem.next;
+      auxItem      := get(this, Rc.first);
+      auxPos       := auxItem.next;
+      auxItem.next := Rc.erased;
+      Rc.erased    := Rc.first;
+      update(this, Rc.first, auxItem);
+      Rc.first     := auxPos;
       setControlRecord(this, Rc);
+      auxItem.next := NULLIDX;
+      pop          := auxItem;
     end;
 end;
 
@@ -254,7 +263,7 @@ begin
 end;
 
 function  generateModifier (var this : tStackOca;  modifier : tModifiers; cell: integer) : tOcaModifier;
-var 
+var
   item: tOcaModifier;
 begin
   item.modifier    := modifier;

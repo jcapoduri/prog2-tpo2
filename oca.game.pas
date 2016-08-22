@@ -14,7 +14,7 @@ CONST
   GAMEFILESPATH = 'games/';
 
 const
-  NMBSPACES = 63;
+  NMBSPACES = 10; //63
 
 type
   tOcaCellInfo   = record
@@ -23,7 +23,7 @@ type
                      modifier : tModifiers;
                    end;
   tOcaPlayerInfo = record
-                     looseTurns  : integer;    
+                     looseTurns  : integer;
                      overTurns   : integer;
                      currentCell : tOcaSpace;
                    end;
@@ -91,7 +91,7 @@ begin
 end;
 
 procedure generateGooseCells (var this : tOcaGame);
-var 
+var
   gooseCells, i : integer;
   cellNumber    : integer;
   item          : tOcaModifier;
@@ -116,11 +116,11 @@ begin
     begin
       cell1 := random(NMBSPACES - 6);
       cell2 := cell1 + 6;
-      if ( not oca.modifiers.existsCell(this.data.rules, cell1) ) and 
+      if ( not oca.modifiers.existsCell(this.data.rules, cell1) ) and
          ( not oca.modifiers.existsCell(this.data.rules, cell2) ) then
          begin
-           item1 := oca.modifiers.generateModifier(this.data.rules, Bridge, cell1); 
-           item2 := oca.modifiers.generateModifier(this.data.rules, Bridge, cell2); 
+           item1 := oca.modifiers.generateModifier(this.data.rules, Bridge, cell1);
+           item2 := oca.modifiers.generateModifier(this.data.rules, Bridge, cell2);
            insertCell(this, item1);
            insertCell(this, item2);
            bridgesInserted := true;
@@ -140,11 +140,11 @@ begin
       space := random(NMBSPACES - 20) + 20; //to have a random number upper than 20 but below NMBSPACES
       cell1 := random(NMBSPACES - space);
       cell2 := cell1 + space;
-      if ( not oca.modifiers.existsCell(this.data.rules, cell1) ) and 
+      if ( not oca.modifiers.existsCell(this.data.rules, cell1) ) and
          ( not oca.modifiers.existsCell(this.data.rules, cell2) ) then
          begin
-           item1 := oca.modifiers.generateModifier(this.data.rules, Dice, cell1); 
-           item2 := oca.modifiers.generateModifier(this.data.rules, Dice, cell2); 
+           item1 := oca.modifiers.generateModifier(this.data.rules, Dice, cell1);
+           item2 := oca.modifiers.generateModifier(this.data.rules, Dice, cell2);
            insertCell(this, item1);
            insertCell(this, item2);
            dicesInserted := true;
@@ -164,7 +164,7 @@ begin
       cell := random(NMBSPACES - lowerLimit) + lowerLimit;
       if not oca.modifiers.existsCell(this.data.rules, cell) then
          begin
-           item := oca.modifiers.generateModifier(this.data.rules, modifier, cell); 
+           item := oca.modifiers.generateModifier(this.data.rules, modifier, cell);
            insertCell(this, item);
            inserted := true;
          end;
@@ -262,7 +262,7 @@ begin
       currItem    := oca.modifiers.pop(this.data.rules);
       keepLooping := not oca.modifiers.isEmpty(this.data.rules);
       if keepLooking then
-        if currItem.cell = item.cell then 
+        if currItem.cell = item.cell then
           begin
             keepLooking := false;
             modifier    := currItem.modifier;
@@ -279,7 +279,7 @@ begin
       found      := oca.space.search(this.data.path, currItem.cell, pos);
       resultItem := oca.space.get(this.data.path, pos);
     end;
-  
+
   // move all items into the rules stack
   while not oca.modifiers.isEmpty(tempStack) do
     oca.modifiers.push(this.data.rules, pop(tempStack));
@@ -289,7 +289,7 @@ end;
 
 procedure reactToGoose (var this : tOcaGame; player: integer);
 begin
-  
+
 end;
 
 procedure setCurrentPlayer  (var this : tOcaGame; player: integer);
@@ -316,12 +316,12 @@ procedure movePlayer (var this : tOcaGame; player, movements : integer);
 var
   i: Integer;
 begin
-  
+
 end;
 
 procedure playerReactToCell (var this : tOcaGame; player : integer);
 begin
-  
+
 end;
 
 function  nextPlayer        (var this: tOcaGame) : integer;

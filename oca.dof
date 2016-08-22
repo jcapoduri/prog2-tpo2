@@ -90,8 +90,8 @@ MaxStackSize=1048576
 ImageBase=4194304
 ExeDescription=
 [Directories]
-OutputDir=bin/
-UnitOutputDir=obj/
+OutputDir=
+UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=
@@ -134,8 +134,10 @@ Comments=
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlUnitOutputDirectory]
-Count=1
-Item0=obj/
+Count=2
+Item0=obj
+Item1=obj/
 [HistoryLists\hlOutputDirectorry]
-Count=1
-Item0=bin/
+Count=2
+Item0=bin
+Item1=bin/

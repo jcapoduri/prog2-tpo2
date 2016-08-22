@@ -19,7 +19,7 @@ type
                      first  : idxRange;
                      last   : idxRange;
                      erased : idxRange;
-                     count  : integer;              
+                     count  : integer;
                    end;
   tControl       = file of tControlRecord;
   tData          = file of tOcaMovement;
@@ -48,7 +48,7 @@ type
 implementation
 
 function getControlRecord(var this : tQueueOcaMvmt) : tControlRecord;
-var 
+var
   Rc : tControlRecord;
 begin
   reset(this.control);
@@ -182,7 +182,8 @@ begin
   if Rc.erased = NULLIDX then
     begin
       reset(this.data);
-      seek (this.data, FileSize(this.data));
+      pos := FileSize(this.data);
+      seek (this.data, pos);
       write(this.data, item);
       close(this.data);
     end
@@ -192,7 +193,7 @@ begin
       auxItem   := get(this, Rc.erased);
       Rc.erased := auxItem.next;
 
-      update(this, pos, item);      
+      update(this, pos, item);
 
       setControlRecord(this, Rc);
     end;
@@ -213,38 +214,9 @@ begin
   else
     begin
       item := get(this, pos);
-      next := item.next;  
-    end;  
-end;
-
-{function  search (var this : tQueueOcaMvmt; key : tKey; var pos : idxRange) : boolean;
-var
-  found : boolean;
-  Rc    : tControlRecord;
-  Ridx  : idxRange; 
-  item  : tOcaMovement;
-begin
-  found := false;
-  Rc    := getControlRecord(this);
-  pos   := NULLIDX;
-  if Rc.first <> Rc.last then
-    begin
-      repeat
-        Ridx := next(this, pos);
-        item := get(this, Ridx);
-        if item.number = key then
-          found := true
-        else
-          begin
-            pos := Ridx;          
-          end;
-      until found or (Ridx = Rc.last) or (item.number > key);
+      next := item.next;
     end;
-  
-  if found then pos := Ridx;
-
-  search := found;
-end;}
+end;
 
 procedure insert (var this : tQueueOcaMvmt; item : tOcaMovement);
 var
@@ -261,9 +233,9 @@ begin
       Rc.count := 1;
       setControlRecord(this, Rc);
     end
-  else  
+  else
     //if not search(this, item.number, pos) then
-      begin      
+      begin
         auxPos  := append(this, item);
 
         if pos = NULLIDX then
@@ -279,21 +251,21 @@ begin
         update(this, auxPos, auxItem);
 
         item.next := pos;
-        update(this, pos, item);   
+        update(this, pos, item);
 
         Rc.count := Rc.count + 1;
-        setControlRecord(this, Rc);   
+        setControlRecord(this, Rc);
       end;
 end;
 
 procedure deletePos (var this : tQueueOcaMvmt; pos : idxRange);
 begin
-  
+
 end;
 
 procedure deleteItem (var this : tQueueOcaMvmt; item : tOcaMovement);
 begin
-  
+
 end;
 
 function  isValidPos (var this : tQueueOcaMvmt; pos : idxRange) : Boolean;
