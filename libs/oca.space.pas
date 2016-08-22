@@ -235,14 +235,12 @@ begin
         if item.cell = cell then
           found := true
         else
-          begin
+          if (item.cell < cell) then
             pos := Ridx;
-          end;
       until found or (Ridx = Rc.last) or (item.cell > cell);
     end;
 
-  //if found then pos := Ridx;
-  writeln('flag: ', Ridx, ':', Rc.last, ':',item.cell, ':', cell);
+  if found then pos := Ridx;
 
   search := found;
 end;

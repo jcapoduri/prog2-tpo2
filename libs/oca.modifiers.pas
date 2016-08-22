@@ -151,23 +151,23 @@ begin
       reset(this.data);
       pos := filesize(this.data);
       seek(this.data, pos);
+      item.next := NULLIDX;
       write(this.data, item);
       close(this.data);
     end
   else
     begin
       pos       := Rc.erased;
-      auxItem   := get(this, Rc.erased);
+      auxItem   := get(this, pos);
       Rc.erased := auxItem.next;
+      item.next := NULLIDX;
 
       update(this, pos, item);
-
       setControlRecord(this, Rc);
     end;
   append := pos;
 end;
 
-// public functions
 procedure push (var this : tStackOca; item : tOcaModifier);
 var
   auxPos : idxRange;
@@ -176,19 +176,20 @@ begin
   Rc := getControlRecord(this);
   if Rc.first = NULLIDX then
     begin
-      Rc.first := append(this, item);
-      item.next := NULLIDX;
-      setControlRecord(this, Rc);
-      update(this, Rc.first, item);
+      auxPos   := append(this, item);
+      Rc       := getControlRecord(this);
+      Rc.first := auxPos;
     end
   else
     begin
       auxPos      := append(this, item);
+      Rc          := getControlRecord(this);
       item.next   := Rc.first;
       Rc.first    := auxPos;
       update(this, auxPos, item);
-      setControlRecord(this, Rc);
     end;
+
+  setControlRecord(this, Rc);
 end;
 
 function  peek (var this : tStackOca) : tOcaModifier;
@@ -217,8 +218,9 @@ begin
       auxItem      := get(this, Rc.first);
       auxPos       := auxItem.next;
       auxItem.next := Rc.erased;
-      Rc.erased    := Rc.first;
       update(this, Rc.first, auxItem);
+
+      Rc.erased    := Rc.first;
       Rc.first     := auxPos;
       setControlRecord(this, Rc);
       auxItem.next := NULLIDX;
@@ -258,7 +260,8 @@ begin
       if (item.cell = cell) then
         existsCell := true
       else
-        existsCell := false;
+        existsCell := existsCell(this, cell);
+      push(this, item);
     end;
 end;
 

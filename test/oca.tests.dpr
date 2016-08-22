@@ -61,6 +61,56 @@ begin
   until  pos = NULLIDX
 end;
 
+procedure showStack(path : string);
+var
+  pos  : integer;
+  data : oca.modifiers.tData;
+  ctrl : oca.modifiers.tControl;
+  item : oca.modifiers.tOcaModifier;
+  Rc   : oca.modifiers.tControlRecord;
+  stack: oca.modifiers.tStackOca;
+begin
+  assign(data, path + '.dat');
+  reset(data);
+  assign(ctrl, path + '.ctrl');
+  reset(ctrl);
+  seek(ctrl, 0);
+  read(ctrl, Rc);
+  writeln('Control: f: ', Rc.first, ' e: ', Rc.erased);
+  pos := Rc.first;
+  repeat
+    begin
+      seek(data, pos);
+      read(data, item);
+      writeln(pos, ' | ', item.modifier, ' | ', item.cell, ' | ', item.next);
+      pos := item.next;
+    end;
+  until  pos = NULLIDX;
+
+  {oca.modifiers.loadStack(stack, path, '');
+  while not oca.modifiers.isEmpty(stack) do
+    item := oca.modifiers.pop(stack);
+
+seek(ctrl, 0);
+  read(ctrl, Rc);
+   writeln('Control: f: ', Rc.first, ' e: ', Rc.erased);
+
+  oca.modifiers.push(stack, item);
+
+  seek(ctrl, 0);
+  read(ctrl, Rc);
+   writeln('Control: f: ', Rc.first, ' e: ', Rc.erased);
+   pos := Rc.erased;
+  repeat
+    begin
+      seek(data, pos);
+      read(data, item);
+      writeln(pos, ' | ', item.modifier, ' | ', item.cell, ' | ', item.next);
+      pos := item.next;
+    end;
+  until  pos = NULLIDX}
+end;
+
 begin
   writeln('instanciate the game');
   oca.game.create(game);
@@ -73,6 +123,9 @@ begin
 
   writeln('show path');
   showPath(GAMEFILESPATH + GAMEFILESNAME);
+
+  writeln('show stack');
+  showStack(GAMEFILESPATH + GAMEFILESRULE);
 
   writeln('set up a 3 players game');
   oca.game.setupGame(game, 3);

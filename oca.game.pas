@@ -14,7 +14,7 @@ CONST
   GAMEFILESPATH = 'games/';
 
 const
-  NMBSPACES = 10; //63
+  NMBSPACES = 63;
 
 type
   tOcaCellInfo   = record
@@ -96,10 +96,10 @@ var
   cellNumber    : integer;
   item          : tOcaModifier;
 begin
-  gooseCells := (NMBSPACES div 2) - 1;
+  gooseCells := (NMBSPACES div 6) - 1;
   for i:= 0 to gooseCells do
     begin
-      cellNumber := Random(gooseCells) + (i * gooseCells);
+      cellNumber := Random(gooseCells) + (i * 6);
       item       := oca.modifiers.generateModifier(this.data.rules, Goose, cellNumber);
       insertCell(this, item);
     end;
@@ -203,9 +203,9 @@ begin
   generateGooseCells(this);
   generateBridges(this);
   generateDices(this);
-  generateRuleCell(this, Inn, 0);
-  generateRuleCell(this, Prison, 0);
-  generateRuleCell(this, Pit, 0);
+  generateRuleCell(this, Inn, 1);
+  generateRuleCell(this, Prison, 1);
+  generateRuleCell(this, Pit, 1);
   generateRuleCell(this, Labyrinth, NMBSPACES div 2);
   generateRuleCell(this, Death, NMBSPACES div 2);
 end;
