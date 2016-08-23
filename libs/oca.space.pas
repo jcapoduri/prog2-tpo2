@@ -143,6 +143,7 @@ var
   Rc : tControlRecord;
 begin
   Rc    := getControlRecord(this);
+  writeln('first! ', Rc.first);
   first := Rc.first;
 end;
 

@@ -23,7 +23,6 @@ type
                      modifier : tModifiers;
                    end;
   tOcaPlayerInfo = record
-                     looseTurns  : integer;
                      overTurns   : integer;
                      currentCell : oca.space.idxRange;
                    end;
@@ -55,6 +54,8 @@ type
 
   procedure movePlayer  (var this : tOcaGame; player, movements : integer);
 
+  procedure playerReactToCell (var this : tOcaGame; player : integer);
+
 implementation
 
 procedure create (var this : tOcaGame);
@@ -70,9 +71,8 @@ var
   idx : oca.space.idxRange;
 begin
   this.control.playersNbr := players;
-  for i := 1 to players do;
+  for i := 1 to players do
     begin
-      this.control.players[i].looseTurns := 0;
       this.control.players[i].overTurns  := 0;
       //oca.space.search(this.data.path, 1, idx);
       this.control.players[i].currentCell := oca.space.first(this.data.path);
@@ -99,7 +99,7 @@ var
   item          : tOcaModifier;
 begin
   gooseCells := (NMBSPACES div 6) - 1;
-  for i:= 0 to gooseCells do
+  for i:= gooseCells downto 0 do
     begin
       cellNumber := Random(gooseCells) + (i * 6);
       item       := oca.modifiers.generateModifier(this.data.rules, Goose, cellNumber);
@@ -291,9 +291,17 @@ begin
   retrieveNextItemNotThisOne := found;
 end;
 
-procedure reactToGoose (var this : tOcaGame; player: integer);
+procedure reactToGoose (var this : tOcaGame; var player: tOcaPlayerInfo);
+var
+  newTile  : integer;
+  modifier : tOcaModifier;
 begin
-
+  modifier := oca.modifiers.generateModifier(this.data.rules, Goose, player.currentCell);
+  if oca.modifiers.nextAfter(this.data.rules, modifier, newTile) then
+    begin
+      oca.space.search(this.data.path, newTile, player.currentCell);
+    end;
+  player.overTurns := player.overTurns + 1;
 end;
 
 procedure setCurrentPlayer  (var this : tOcaGame; player: integer);
@@ -342,7 +350,7 @@ end;
 
 procedure movePlayer (var this : tOcaGame; player, movements : integer);
 var
-item : tOcaMovement;
+  item : tOcaMovement;
 begin
   //add movement to queue
   item := oca.movements.createMovement(this.data.movements, player, movements);
@@ -353,8 +361,22 @@ begin
 end;
 
 procedure playerReactToCell (var this : tOcaGame; player : integer);
+var
+  moveForward : boolean;
+  i           : integer;
+  tempIdx     : oca.space.idxRange;
+  modifier    : tModifiers;
+  tile        : tOcaSpace;
+  playerInfo  : tOcaPlayerInfo;
 begin
+  playerInfo := this.control.players[player];
+  tile       := oca.space.get(this.data.path, playerInfo.currentCell);
 
+  oca.modifiers.search(this.data.rules, tile.cell, modifier);
+  case modifier of
+    Goose: reactToGoose(this, playerInfo);
+  end;
+  this.control.players[player] := playerInfo;
 end;
 
 function  nextPlayer        (var this: tOcaGame) : integer;

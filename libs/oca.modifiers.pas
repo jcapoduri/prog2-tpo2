@@ -34,6 +34,7 @@ type
   function  pop              (var this : tStackOca) : tOcaModifier;
   function  isEmpty          (var this : tStackOca) : boolean;
   function  search           (var this : tStackOca; cell : integer; var modifier : tModifiers) : boolean;
+  function  nextAfter        (var this : tStackOca; modifier : tOcaModifier; var cellnumber : integer) : boolean;
   function  existsCell       (var this : tStackOca; cell: integer) : boolean;
   function  generateModifier (var this : tStackOca;  modifier : tModifiers; cell: integer) : tOcaModifier;
 
@@ -246,6 +247,33 @@ begin
       search := search(this, cell, modifier);
 
   push(this, item);
+end;
+
+function  innerNextAfter (var this : tStackOca; modifier : tOcaModifier; var cellnumber : integer; alreadyFound : boolean) : boolean;
+var
+  item : tOcaModifier;
+begin
+  item := pop(this);
+  if alreadyFound then
+    if item.modifier = modifier.modifier then
+      begin
+        cellnumber     := item.cell;
+        innerNextAfter := true;
+      end
+    else
+      innerNextAfter := innerNextAfter(this, modifier, cellnumber, alreadyFound)
+  else
+    begin
+      if item.cell = modifier.cell then
+        alreadyFound := true;
+      innerNextAfter := innerNextAfter(this, modifier, cellnumber, alreadyFound);
+    end;
+  push(this, item);
+end;
+
+function  nextAfter (var this : tStackOca; modifier : tOcaModifier; var cellnumber : integer) : boolean;
+begin
+  nextAfter := innerNextAfter(this, modifier, cellnumber, false);
 end;
 
 function  existsCell (var this : tStackOca; cell: integer) : boolean;
