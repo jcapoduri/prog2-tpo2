@@ -245,6 +245,7 @@ end;
 
 
 // retrieves the next tOcaSpace with the same modifier that item AFTER the item itself from the stack
+
 function retrieveNextItemNotThisOne (var this : tOcaGame; item : tOcaSpace; var resultItem : tOcaSpace) : boolean;
 var
   keepLooping : boolean;
@@ -291,6 +292,18 @@ begin
   retrieveNextItemNotThisOne := found;
 end;
 
+function searchStackByModifier (var this : tOcaGame; modifier : tModifiers) : integer;
+var
+  item : tOcaModifier;
+begin
+  item := oca.modifiers.pop(this.data.rules);
+  if item.modifier = modifier then
+    searchStackByModifier := item.cell
+  else
+    searchStackByModifier := searchStackByModifier(this, modifier);
+  push(this.data.rules, item);
+end;
+
 procedure reactToGoose (var this : tOcaGame; var player: tOcaPlayerInfo);
 var
   newTile  : integer;
@@ -304,20 +317,41 @@ begin
   player.overTurns := player.overTurns + 1;
 end;
 
-//procedure reactTo (var this : tOcaGame; var player: tOcaPlayerInfo);
 procedure reactToTile      (var this : tOcaGame; var player: tOcaPlayerInfo; overturns : integer);
-  begin
-    player.overturns := player.overturns + overturns;
-  end;
+begin
+  player.overturns := player.overturns + overturns;
+end;
 
 procedure reactToBridge (var this : tOcaGame; var player: tOcaPlayerInfo);
+var
+  i        : integer;
+  item     : tOcaSpace;
+  modifier : tOcaModifier;
 begin
-  //todo
+
+  item := oca.space.get(this.data.path, player.currentCell);
+  modifier := oca.modifiers.generateModifier(this.data.rules, Bridge, item.cell);
+  if oca.modifiers.nextAfter(this.data.rules, modifier, i) then
+    oca.space.search(this.data.path, i, player.currentCell)
+  else
+    oca.space.search(this.data.path, searchStackByModifier(this, Bridge), player.currentCell)
 end;
 
 procedure reactToLabyrinth (var this : tOcaGame; var player: tOcaPlayerInfo);
+var
+  i        : integer;
+  item     : tOcaSpace;
+  modifier : tModifiers;
 begin
-  //todo
+  //go back 12 positions
+  for i := 12 to 0 do player.currentCell := oca.space.prev(this.data.path, player.currentCell);
+  //keep going back until normal position found
+  item := oca.space.get(this.data.path, player.currentCell);
+  while not oca.modifiers.search(this.data.rules, item.cell, modifier) do
+    begin
+      player.currentCell := oca.space.prev(this.data.path, player.currentCell);
+      item := oca.space.get(this.data.path, player.currentCell);
+    end;
 end;
 
 procedure reactToDeath     (var this : tOcaGame; var player: tOcaPlayerInfo);
