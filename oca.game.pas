@@ -304,6 +304,28 @@ begin
   player.overTurns := player.overTurns + 1;
 end;
 
+//procedure reactTo (var this : tOcaGame; var player: tOcaPlayerInfo);
+procedure reactToTile      (var this : tOcaGame; var player: tOcaPlayerInfo; overturns : integer);
+  begin
+    player.overturns := player.overturns + overturns;
+  end;
+
+procedure reactToBridge (var this : tOcaGame; var player: tOcaPlayerInfo);
+begin
+  //todo
+end;
+
+procedure reactToLabyrinth (var this : tOcaGame; var player: tOcaPlayerInfo);
+begin
+  //todo
+end;
+
+procedure reactToDeath     (var this : tOcaGame; var player: tOcaPlayerInfo);
+begin
+  player.currentCell := oca.space.first(this.data.path);
+end;
+
+
 procedure setCurrentPlayer  (var this : tOcaGame; player: integer);
 begin
   this.control.currentPlay := player;
@@ -374,7 +396,14 @@ begin
 
   oca.modifiers.search(this.data.rules, tile.cell, modifier);
   case modifier of
-    Goose: reactToGoose(this, playerInfo);
+    Goose     : reactToGoose(this, playerInfo);
+    Dice      : reactToTile(this, playerInfo, 1);
+    Prison    : reactToTile(this, playerInfo, -3);
+    Inn       : reactToTile(this, playerInfo, -2);
+    Pit       : reactToTile(this, playerInfo, -4);
+    Bridge    : reactToBridge(this, playerInfo);
+    Labyrinth : reactToLabyrinth(this, playerInfo);
+    Death     : reactToDeath(this, playerInfo);
   end;
   this.control.players[player] := playerInfo;
 end;
