@@ -148,14 +148,14 @@ begin
       playerInfo  := game.control.players[j];
       writeln('p:', j, ' mvt:', k, ' pos: ', playerInfo.currentCell);
       tile     := oca.space.get(game.data.path, playerInfo.currentCell);
-      oca.modifiers.search(game.data.rules, playerInfo.currentCell, modifier);
+      oca.modifiers.search(game.data.rules, tile.cell, modifier);
       writeln('casillero actual: ', tile.cell, ' modifier: ', modifier);
       oca.game.playerReactToCell(game, j);
       writeln('after react: ');
       playerInfo  := game.control.players[j];
       writeln('p:', j, ' mvt:', k, ' pos: ', playerInfo.currentCell);
       tile     := oca.space.get(game.data.path, playerInfo.currentCell);
-      oca.modifiers.search(game.data.rules, playerInfo.currentCell, modifier);
+      oca.modifiers.search(game.data.rules, tile.cell, modifier);
       writeln('casillero actual: ', tile.cell, ' modifier: ', modifier);
       writeln('-----------------------------------------------------');
     end;
