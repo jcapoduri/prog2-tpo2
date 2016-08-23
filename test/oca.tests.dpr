@@ -11,12 +11,13 @@ const
   n = 20;
 
 var
-  game  : oca.game.tOcaGame;
-  mvt   : oca.movements.tOcaMovement;
-  i, j, k : integer;
-  path  : tListOcaSpace;
-  rules : tStackOca;
+  game        : oca.game.tOcaGame;
+  mvt         : oca.movements.tOcaMovement;
+  i, j, k     : integer;
+  path        : tListOcaSpace;
+  rules       : tStackOca;
   tile        : tOcaSpace;
+  modifier    : oca.modifiers.tModifiers;
   playerInfo  : tOcaPlayerInfo;
 
 procedure dumpPathData(path : string);
@@ -146,8 +147,9 @@ begin
       writeln('after mvmnt');
       playerInfo  := game.control.players[j];
       writeln('p:', j, ' mvt:', k, ' pos: ', playerInfo.currentCell);
-      tile := oca.space.get(game.data.path, playerInfo.currentCell);
-      writeln('casillero actual: ', tile.cell);
+      tile     := oca.space.get(game.data.path, playerInfo.currentCell);
+      oca.modifiers.search(game.data.rules, playerInfo.currentCell, modifier);
+      writeln('casillero actual: ', tile.cell, ' modifier: ', modifier);
       writeln('-----------------------------------------------------');
     end;
   //it should call in a loop
