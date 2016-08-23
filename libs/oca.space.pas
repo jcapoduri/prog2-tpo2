@@ -39,6 +39,7 @@ type
   function  first         (var this : tListOcaSpace) : idxRange;
   function  last          (var this : tListOcaSpace) : idxRange;
   function  next          (var this : tListOcaSpace; pos : idxRange) : idxRange;
+  function  prev          (var this : tListOcaSpace; pos : idxRange) : idxRange;
   function  search        (var this : tListOcaSpace; cell : integer; var pos : idxRange) : boolean;
 
   function  isValidPos    (var this : tListOcaSpace; pos : idxRange) : boolean;
@@ -214,6 +215,30 @@ begin
     begin
       item := get(this, pos);
       next := item.next;
+    end;
+end;
+
+function  prev (var this : tListOcaSpace; pos : idxRange) : idxRange;
+var
+  Rc   : tControlRecord;
+  idx  : idxRange;
+  item : tOcaSpace;
+begin
+  Rc   := getControlRecord(this);
+  if pos = Rc.first then
+    begin
+      prev := NULLIDX;
+    end
+  else
+    begin
+      idx := Rc.first;
+      item := get(this, idx);
+      while item.next <> pos do
+        begin
+          idx := item.next;
+          item := get(this, idx);
+        end;
+      prev := idx;
     end;
 end;
 

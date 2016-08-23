@@ -25,7 +25,7 @@ type
   tOcaPlayerInfo = record
                      looseTurns  : integer;
                      overTurns   : integer;
-                     currentCell : tOcaSpace;
+                     currentCell : oca.space.idxRange;
                    end;
   tOcaGameData    = record
                       path      : tListOcaSpace;
@@ -74,8 +74,8 @@ begin
     begin
       this.control.players[i].looseTurns := 0;
       this.control.players[i].overTurns  := 0;
-      oca.space.search(this.data.path, 1, idx);
-      this.control.players[i].currentCell := oca.space.get(this.data.path, idx);
+      //oca.space.search(this.data.path, 1, idx);
+      this.control.players[i].currentCell := oca.space.first(this.data.path);
     end;
 
   this.control.currentPlay := 1;
@@ -215,6 +215,7 @@ end;
 function getCellInfo (var this: tOcaGame; number: integer) : tOcaCellInfo;
 var
   i        : integer;
+  tile     : tOcaSpace;
   item     : tOcaCellInfo;
   player   : tOcaPlayerInfo;
   modifier : tModifiers;
@@ -230,7 +231,8 @@ begin
   for i := 1 to this.control.playersNbr do
     begin
       player := this.control.players[i];
-      if player.currentCell.cell = number then
+      tile   := oca.space.get(this.data.path, player.currentCell);
+      if tile.cell = number then
         item.players[i] := true;
     end;
 
@@ -314,12 +316,40 @@ begin
   currentPlayerInfo := this.control.players[this.control.currentPlay];
 end;
 
+procedure applyPlayerMovement (var this : tOcaGame; player, movements : integer);
+var
+  moveForward : boolean;
+  i           : integer;
+  tempIdx     : oca.space.idxRange;
+  playerInfo  : tOcaPlayerInfo;
+begin
+  moveForward := true;
+  playerInfo  := this.control.players[player];
+  for i  := movements downto 1 do
+    begin
+      if moveForward then
+        begin
+          tempIdx := oca.space.next(this.data.path, playerInfo.currentCell);
+          if tempIdx = oca.space.last(this.data.path) then
+            moveForward := false;
+        end
+      else
+        tempIdx := oca.space.prev(this.data.path, playerInfo.currentCell);
+      playerInfo.currentCell := tempIdx;
+    end;
+  this.control.players[player] := playerInfo;
+end;
+
 procedure movePlayer (var this : tOcaGame; player, movements : integer);
 var
 item : tOcaMovement;
 begin
+  //add movement to queue
   item := oca.movements.createMovement(this.data.movements, player, movements);
   oca.movements.queue(this.data.movements, item);
+
+  //apply movement
+  applyPlayerMovement(this, player, movements);
 end;
 
 procedure playerReactToCell (var this : tOcaGame; player : integer);

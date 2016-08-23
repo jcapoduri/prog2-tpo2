@@ -8,14 +8,16 @@ uses
   oca.modifiers in '../libs/oca.modifiers.pas';
 
 const
-  n = 2;
+  n = 20;
 
 var
   game  : oca.game.tOcaGame;
   mvt   : oca.movements.tOcaMovement;
-  i     : integer;
+  i, j, k : integer;
   path  : tListOcaSpace;
   rules : tStackOca;
+  tile        : tOcaSpace;
+  playerInfo  : tOcaPlayerInfo;
 
 procedure dumpPathData(path : string);
 var
@@ -132,6 +134,29 @@ begin
 
 
   writeln('load ', n, ' movements to this play');
+  Randomize;
+  for i := 0 to n do
+    begin
+      j := i mod 3 + 1;
+      k := Random(5) + 1;
+      writeln('before mvmnt');
+      playerInfo  := game.control.players[j];
+      writeln('p:', j, ' mvt:', k, ' pos: ', playerInfo.currentCell);
+      oca.game.movePlayer(game, j, k);
+      writeln('after mvmnt');
+      playerInfo  := game.control.players[j];
+      writeln('p:', j, ' mvt:', k, ' pos: ', playerInfo.currentCell);
+      tile := oca.space.get(game.data.path, playerInfo.currentCell);
+      writeln('casillero actual: ', tile.cell);
+      writeln('-----------------------------------------------------');
+    end;
+  //it should call in a loop
+  //movePlayer
+  //applyMovement
+  //react
+  //render
+  //checkwinner
+  //nextplayer
 
   writeln('All tests runned');
 end.
