@@ -117,9 +117,9 @@ begin
   oca.game.setupGame(game, 3);
 
 
-  writeln('load ', n, ' movements to this play');
+  writeln('start random play with ', n, ' players until the end');
   Randomize;
-  for i := 0 to n do
+  while not oca.game.currentPlayerWon(game) do
     begin
       j := oca.game.currentPlayer(game);
       k := Random(2) + 1; //1 to 3 - more chances to get some special tile
@@ -144,7 +144,8 @@ begin
       oca.modifiers.search(game.data.rules, tile.cell, modifier);
       writeln('casillero actual: ', tile.cell, ' modifier: ', modifier);
       writeln('-----------------------------------------------------');
-      oca.game.nextPlayer(game);
+      if not oca.game.currentPlayerWon(game) then
+        oca.game.nextPlayer(game);
     end;
   //it should call in a loop
   // [X] current player 
@@ -152,7 +153,7 @@ begin
   // [X] applyMovement
   // [X] react
   // [ ] render
-  // [ ] checkwinner
+  // [X] checkwinner
   // [X] nextplayer
 
   writeln('All tests runned');

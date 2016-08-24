@@ -55,6 +55,7 @@ type
   procedure movePlayer  (var this : tOcaGame; player, movements : integer);
 
   procedure playerReactToCell (var this : tOcaGame; player : integer);
+  function currentPlayerWon   (var this: tOcaGame) : boolean;
 
 implementation
 
@@ -345,10 +346,10 @@ var
   modifier : tModifiers;
 begin
   //go back 12 positions
-  for i := 12 to 0 do player.currentCell := oca.space.prev(this.data.path, player.currentCell);
+  for i := 0 to 12 do player.currentCell := oca.space.prev(this.data.path, player.currentCell);
   //keep going back until normal position found
   item := oca.space.get(this.data.path, player.currentCell);
-  while not oca.modifiers.search(this.data.rules, item.cell, modifier) do
+  while oca.modifiers.search(this.data.rules, item.cell, modifier) do
     begin
       player.currentCell := oca.space.prev(this.data.path, player.currentCell);
       item := oca.space.get(this.data.path, player.currentCell);
@@ -449,7 +450,7 @@ var
   current : tOcaPlayerInfo;
   found   : boolean;
 begin
-  next    := this.control.currentPlayer; //(this.control.currentPlayer mod this.control.playersNbr) + 1;
+  next    := this.control.currentPlayer;
   current := this.control.players[next];
   found   := false;
   if (current.overturns > 0) then
@@ -464,14 +465,22 @@ begin
         current := this.control.players[next];
         if current.overTurns < 0 then
           begin
-            current.overTurns := current.overTurns - 1;
+            current.overTurns := current.overTurns + 1;
             this.control.players[next] := current;
-          end;
-        if current.overTurns >= 0 then 
+          end
+        else 
           found := true;
       end;
   this.control.currentPlayer := next;
   nextPlayer := next;
+end;
+
+function currentPlayerWon (var this: tOcaGame) : boolean;
+var
+  current : tOcaPlayerInfo;
+begin
+  current := currentPlayerInfo(this);
+  currentPlayerWon := current.currentCell = oca.space.last(this.data.path);
 end;
 
 end.
