@@ -308,8 +308,10 @@ procedure reactToGoose (var this : tOcaGame; var player: tOcaPlayerInfo);
 var
   newTile  : integer;
   modifier : tOcaModifier;
+  item     : tOcaSpace;
 begin
-  modifier := oca.modifiers.generateModifier(this.data.rules, Goose, player.currentCell);
+  item     := oca.space.get(this.data.path, player.currentCell);
+  modifier := oca.modifiers.generateModifier(this.data.rules, Goose, item.cell);
   if oca.modifiers.nextAfter(this.data.rules, modifier, newTile) then
     begin
       oca.space.search(this.data.path, newTile, player.currentCell);
@@ -328,7 +330,6 @@ var
   item     : tOcaSpace;
   modifier : tOcaModifier;
 begin
-
   item := oca.space.get(this.data.path, player.currentCell);
   modifier := oca.modifiers.generateModifier(this.data.rules, Bridge, item.cell);
   if oca.modifiers.nextAfter(this.data.rules, modifier, i) then

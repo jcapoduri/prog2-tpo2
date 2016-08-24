@@ -143,7 +143,6 @@ var
   Rc : tControlRecord;
 begin
   Rc    := getControlRecord(this);
-  writeln('first! ', Rc.first);
   first := Rc.first;
 end;
 
@@ -162,6 +161,7 @@ begin
   reset (this.data);
   seek  (this.data, pos);
   read  (this.data, item);
+  close (this.data);
   get := item;
 end;
 

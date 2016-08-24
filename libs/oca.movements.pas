@@ -165,6 +165,7 @@ begin
   reset (this.data);
   seek  (this.data, pos);
   read  (this.data, item);
+  close (this.data);
   get := item;
 end;
 

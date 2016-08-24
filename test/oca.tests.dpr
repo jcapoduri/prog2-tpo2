@@ -36,6 +36,7 @@ begin
       writeln(pos, ' | ', item.cell, ' | ', item.next);
       pos := pos + 1
     end;
+  close(data);  
 end;
 
 procedure showPath(path : string);
@@ -61,7 +62,9 @@ begin
       writeln(pos, ' | ', item.cell, ' | ', item.next);
       pos := item.next;
     end;
-  until  pos = NULLIDX
+  until  pos = NULLIDX;
+  close(data);
+  close(ctrl);
 end;
 
 procedure showStack(path : string);
@@ -90,28 +93,8 @@ begin
     end;
   until  pos = NULLIDX;
 
-  {oca.modifiers.loadStack(stack, path, '');
-  while not oca.modifiers.isEmpty(stack) do
-    item := oca.modifiers.pop(stack);
-
-seek(ctrl, 0);
-  read(ctrl, Rc);
-   writeln('Control: f: ', Rc.first, ' e: ', Rc.erased);
-
-  oca.modifiers.push(stack, item);
-
-  seek(ctrl, 0);
-  read(ctrl, Rc);
-   writeln('Control: f: ', Rc.first, ' e: ', Rc.erased);
-   pos := Rc.erased;
-  repeat
-    begin
-      seek(data, pos);
-      read(data, item);
-      writeln(pos, ' | ', item.modifier, ' | ', item.cell, ' | ', item.next);
-      pos := item.next;
-    end;
-  until  pos = NULLIDX}
+  close(data);
+  close(ctrl);
 end;
 
 begin
@@ -139,17 +122,20 @@ begin
   for i := 0 to n do
     begin
       j := i mod 3 + 1;
-      k := Random(5) + 1;
+      k := Random(2) + 1; //1 to 3 - more chances to get some special tile
+      
       writeln('before mvmnt');
       playerInfo  := game.control.players[j];
       writeln('p:', j, ' mvt:', k, ' pos: ', playerInfo.currentCell);
       oca.game.movePlayer(game, j, k);
+      
       writeln('after mvmnt');
       playerInfo  := game.control.players[j];
       writeln('p:', j, ' mvt:', k, ' pos: ', playerInfo.currentCell);
       tile     := oca.space.get(game.data.path, playerInfo.currentCell);
       oca.modifiers.search(game.data.rules, tile.cell, modifier);
       writeln('casillero actual: ', tile.cell, ' modifier: ', modifier);
+      
       oca.game.playerReactToCell(game, j);
       writeln('after react: ');
       playerInfo  := game.control.players[j];
