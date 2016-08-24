@@ -34,7 +34,7 @@ type
   tOcaGameControl = record
                       players     : array[1..4] of tOcaPlayerInfo;
                       playersNbr  : integer;
-                      currentPlay : integer;
+                      currentPlayer : integer;
                     end;
   tOcaGame        = record
                       data        : tOcaGameData;
@@ -78,7 +78,7 @@ begin
       this.control.players[i].currentCell := oca.space.first(this.data.path);
     end;
 
-  this.control.currentPlay := 1;
+  this.control.currentPlayer := 1;
 end;
 
 function insertCell(var this: tOcaGame; item: tOcaModifier): Boolean;
@@ -363,7 +363,7 @@ end;
 
 procedure setCurrentPlayer  (var this : tOcaGame; player: integer);
 begin
-  this.control.currentPlay := player;
+  this.control.currentPlayer := player;
 end;
 
 function getTotalCells (var this : tOcaGame) : integer;
@@ -373,12 +373,12 @@ end;
 
 function  currentPlayer     (var this : tOcaGame) : integer;
 begin
-  currentPlayer := this.control.currentPlay;
+  currentPlayer := this.control.currentPlayer;
 end;
 
 function  currentPlayerInfo (var this : tOcaGame) : tOcaPlayerInfo;
 begin
-  currentPlayerInfo := this.control.players[this.control.currentPlay];
+  currentPlayerInfo := this.control.players[this.control.currentPlayer];
 end;
 
 procedure applyPlayerMovement (var this : tOcaGame; player, movements : integer);
@@ -445,8 +445,33 @@ end;
 
 function  nextPlayer        (var this: tOcaGame) : integer;
 var
-  i: integer;
+  next    : integer;
+  current : tOcaPlayerInfo;
+  found   : boolean;
 begin
+  next    := this.control.currentPlayer; //(this.control.currentPlayer mod this.control.playersNbr) + 1;
+  current := this.control.players[next];
+  found   := false;
+  if (current.overturns > 0) then
+    begin
+      current.overturns := current.overturns - 1;
+      this.control.players[next] := current;
+    end
+  else
+    while not found do
+      begin
+        next := (next mod this.control.playersNbr) + 1;
+        current := this.control.players[next];
+        if current.overTurns < 0 then
+          begin
+            current.overTurns := current.overTurns - 1;
+            this.control.players[next] := current;
+          end;
+        if current.overTurns >= 0 then 
+          found := true;
+      end;
+  this.control.currentPlayer := next;
+  nextPlayer := next;
 end;
 
 end.

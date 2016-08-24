@@ -254,22 +254,27 @@ function  innerNextAfter (var this : tStackOca; modifier : tOcaModifier; var cel
 var
   item : tOcaModifier;
 begin
-  item := pop(this);
-  if alreadyFound then
-    if item.modifier = modifier.modifier then
-      begin
-        cellnumber     := item.cell;
-        innerNextAfter := true;
-      end
-    else
-      innerNextAfter := innerNextAfter(this, modifier, cellnumber, alreadyFound)
+  if isEmpty(this) then
+    innerNextAfter := false
   else
     begin
-      if item.cell = modifier.cell then
-        alreadyFound := true;
-      innerNextAfter := innerNextAfter(this, modifier, cellnumber, alreadyFound);
+      item := pop(this);
+      if alreadyFound then
+        if item.modifier = modifier.modifier then
+          begin
+            cellnumber     := item.cell;
+            innerNextAfter := true;
+          end
+        else
+          innerNextAfter := innerNextAfter(this, modifier, cellnumber, alreadyFound)
+      else
+        begin
+          if item.cell = modifier.cell then
+            alreadyFound := true;
+          innerNextAfter := innerNextAfter(this, modifier, cellnumber, alreadyFound);
+        end;
+      push(this, item);
     end;
-  push(this, item);
 end;
 
 function  nextAfter (var this : tStackOca; modifier : tOcaModifier; var cellnumber : integer) : boolean;

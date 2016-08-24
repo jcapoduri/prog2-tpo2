@@ -121,7 +121,7 @@ begin
   Randomize;
   for i := 0 to n do
     begin
-      j := i mod 3 + 1;
+      j := oca.game.currentPlayer(game);
       k := Random(2) + 1; //1 to 3 - more chances to get some special tile
       
       writeln('before mvmnt');
@@ -144,14 +144,16 @@ begin
       oca.modifiers.search(game.data.rules, tile.cell, modifier);
       writeln('casillero actual: ', tile.cell, ' modifier: ', modifier);
       writeln('-----------------------------------------------------');
+      oca.game.nextPlayer(game);
     end;
   //it should call in a loop
-  //movePlayer
-  //applyMovement
-  //react
-  //render
-  //checkwinner
-  //nextplayer
+  // [X] current player 
+  // [X] movePlayer
+  // [X] applyMovement
+  // [X] react
+  // [ ] render
+  // [ ] checkwinner
+  // [X] nextplayer
 
   writeln('All tests runned');
 end.
