@@ -50,9 +50,10 @@ type
   function  currentPlayer     (var this : tOcaGame) : integer;
   function  currentPlayerInfo (var this : tOcaGame) : tOcaPlayerInfo;
   function  nextPlayer        (var this: tOcaGame) : integer;
-  function  getCellInfo (var this: tOcaGame; number: integer) : tOcaCellInfo;
+  function  getCellInfo       (var this: tOcaGame; number: integer) : tOcaCellInfo;
+  function  getCurrentPlayerCellInfo (var this: tOcaGame) : tOcaCellInfo;
 
-  procedure movePlayer  (var this : tOcaGame; player, movements : integer);
+  procedure movePlayer        (var this : tOcaGame; player, movements : integer);
 
   procedure playerReactToCell (var this : tOcaGame; player : integer);
   function currentPlayerWon   (var this: tOcaGame) : boolean;
@@ -242,6 +243,33 @@ begin
     item.modifier := modifier;
 
   getCellInfo    := item
+end;
+
+function  getCurrentPlayerCellInfo (var this: tOcaGame) : tOcaCellInfo;
+var
+  item     : tOcaCellInfo;
+  tile     : tOcaSpace;
+  player   : tOcaPlayerInfo;
+  modifier : tModifiers;
+begin
+  //clear up item
+  item.players[1] := false;
+  item.players[2] := false;
+  item.players[3] := false;
+  item.players[4] := false;
+  item.cellNmb    := 0;
+  item.modifier   := None;
+
+  //retrieve current player info
+  player       := currentPlayerInfo(this);
+  tile         := oca.space.get(this.data.path, player.currentCell);
+  item.cellNmb := tile.cell;
+
+  //update tile info
+  if oca.modifiers.search(this.data.rules, item.cellNmb, modifier) then
+    item.modifier := modifier;
+
+  getCurrentPlayerCellInfo := item
 end;
 
 

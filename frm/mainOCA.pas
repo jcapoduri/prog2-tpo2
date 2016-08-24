@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Grids,
-  oca.game, StdCtrls, Buttons;
+  oca.game, oca.modifiers, Buttons, StdCtrls;
 
 type
   TForm1 = class(TForm)
@@ -31,6 +31,8 @@ type
     ocaGame : oca.game.tOcaGame;
     procedure updateUI();
     procedure renderMatrix();
+    procedure processThrown();
+    procedure processMovement();
   public
     Constructor new      (owner:  TComponent);
     procedure   initGame (var game : oca.game.tOcaGame);
@@ -61,6 +63,7 @@ end;
 
 procedure TForm1.updateUI;
 begin
+  Self.playerLabel.Caption := IntToStr(oca.game.currentPlayer(Self.ocaGame));
   Self.renderMatrix();
 end;
 
@@ -100,6 +103,45 @@ begin
        dice := RandomRange(1, 6);
        Self.diceEdit.Text := IntToStr(dice);
      end;
+  Self.processThrown;
+end;
+
+procedure TForm1.processMovement;
+var
+  current : integer;
+  item    : tOcaCellInfo;
+begin
+  item := oca.game.getCurrentPlayerCellInfo(Self.ocaGame);
+  case item.modifier of
+    Goose     : MessageDlg('Has caido en un casillero de la oca, seguiras hasta la siguiente oca y tiras de nuevo', mtInformation, [mbOk], 0);
+    Bridge    : MessageDlg('Has caido en un casillero puente, seguras trasladado al otro punte y tiras de nuevo', mtInformation, [mbOk], 0);
+    Dice      : MessageDlg('Has caido en un casillero dado, tiras de nuevo', mtInformation, [mbOk], 0);
+    Inn       : MessageDlg('Has caido en un casillero posada, pierdes 2 turnos', mtInformation, [mbOk], 0);
+    Prison    : MessageDlg('Has caido en un casillero prision, pierdes 3 turnos', mtInformation, [mbOk], 0);
+    Pit       : MessageDlg('Has caido en un casillero pozo, pierdes 4 turnos', mtInformation, [mbOk], 0);
+    Labyrinth : MessageDlg('Has caido en un casillero laberinto, retrocedes al menos 12 casilleros hasta la siguiente posicion neutra', mtInformation, [mbOk], 0);
+    Death     : MessageDlg('Has caido en un casillero muerte, vuelves a empezar', mtInformation, [mbOk], 0);
+  end;
+  if oca.game.currentPlayerWon(Self.ocaGame) then
+    MessageDlg('Has ganado el juego de la oca!', mtInformation, [mbOk], 0)
+  else
+    begin
+      oca.game.playerReactToCell(Self.ocaGame, oca.game.currentPlayer(Self.ocaGame));
+      oca.game.nextPlayer(Self.ocaGame);
+    end;
+  Self.updateUI;
+end;
+
+procedure TForm1.processThrown;
+var
+  dice   : integer;
+  current: integer;
+begin
+  dice    := StrToInt(Self.diceEdit.Text);
+  current := oca.game.currentPlayer(Self.ocaGame);
+  oca.game.movePlayer(Self.ocaGame, current, dice);
+  Self.updateUI;
+  Self.processMovement;
 end;
 
 end.
