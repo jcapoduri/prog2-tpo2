@@ -27,8 +27,11 @@ type
     nextTurnButton: TButton;
     procedure startButtonClick(Sender: TObject);
     procedure diceThrowEvent(Sender: TObject);
+    procedure renderTile(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
+      State: TGridDrawState);
   protected
-    ocaGame : oca.game.tOcaGame;
+    ocaGame   : oca.game.tOcaGame;
+    gameReady : boolean;
     procedure updateUI();
     procedure renderMatrix();
     procedure processThrown();
@@ -43,7 +46,7 @@ var
 
 implementation
 
-uses Math;
+uses Math, DateUtils;
 
 {$R *.dfm}
 
@@ -58,7 +61,7 @@ end;
 constructor TForm1.new(owner:  TComponent);
 begin
   inherited Create(owner);
-  Randomize;
+  Self.gameReady := false;
 end;
 
 procedure TForm1.updateUI;
@@ -77,26 +80,25 @@ begin
   if (Self.playersComboBox.Text = '3 Jugadores') then players := 3;
   if (Self.playersComboBox.Text = '4 Jugadores') then players := 4;
   setupGame(Self.ocaGame, players);
+  Self.gameReady := true;
   updateUI;
 end;
 
 procedure TForm1.renderMatrix;
 var
   i, total : integer;
-  item     : tOcaCellInfo;
 begin
   total := oca.game.getTotalCells(Self.ocaGame);
   for i := 0 to total - 1 do
-    begin
-      item := oca.game.getCellInfo(Self.ocaGame, i + 1);
-      Self.tableBoardGrid.Cells[i mod 8, i div 8] := IntToStr(item.cellNmb) 
-    end;
+    Self.tableBoardGrid.Cells[i mod 8, i div 8] := IntToStr(i + 1);
+
 end;
 
 procedure TForm1.diceThrowEvent(Sender: TObject);
 var
   dice : integer;
 begin
+  Randomize;
   dice := StrToIntDef(Self.diceEdit.Text, 0);
   if ((dice < 1) or (dice > 6)) then
      begin
@@ -142,6 +144,43 @@ begin
   oca.game.movePlayer(Self.ocaGame, current, dice);
   Self.updateUI;
   Self.processMovement;
+end;
+
+procedure TForm1.renderTile(Sender: TObject; ACol, ARow: Integer;
+  Rect: TRect; State: TGridDrawState);
+var
+  tileNumber : integer;
+  i          : integer;
+  tileInfo   : tOcaCellInfo;
+begin
+  if Self.gameReady then begin
+  tileNumber := StrToInt(Self.tableBoardGrid.Cells[ACol, ARow]);
+  tileInfo   := oca.game.getCellInfo(Self.ocaGame, tileNumber);
+  with Self.tableBoardGrid.Canvas do
+  begin
+    //paint background
+    case tileInfo.modifier of
+      Goose     : Brush.Color := clYellow;
+      Bridge    : Brush.Color := clSkyBlue;
+      Dice      : Brush.Color := RGB(255, 180, 0);
+      Inn       : Brush.Color := clLtGray;
+      Prison    : Brush.Color := clGray;
+      Pit       : Brush.Color := clDkGray;
+      Labyrinth : Brush.Color := clNavy;
+      Death     : Brush.Color := clRed;
+      else Brush.Color := clWhite;
+    end;
+    Rectangle(Rect);
+    Brush.Style := bsClear;
+    Brush.Color := clWhite;
+    Font.Color := clBlack;
+    Font.Name := 'Tahoma';
+    Font.Size := 5;
+    TextOut( Rect.Left + 5, Rect.Top + 5, IntToStr(tileNumber));
+    for i := 1 to 4 do
+      if tileInfo.players[i] then TextOut(Rect.Left + 5, (Rect.Bottom - 40) + 7*i, 'Jugador ' + IntToStr(i));
+  end;
+  end;//if
 end;
 
 end.

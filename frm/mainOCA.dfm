@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 400
-  Top = 237
+  Left = 448
+  Top = 163
   Width = 760
   Height = 552
   Caption = 'OCA'
@@ -27,6 +27,7 @@ object Form1: TForm1
     FixedRows = 0
     ScrollBars = ssNone
     TabOrder = 0
+    OnDrawCell = renderTile
   end
   object gameGroupBox: TGroupBox
     Left = 512
