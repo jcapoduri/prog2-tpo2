@@ -61,6 +61,7 @@ end;
 constructor TForm1.new(owner:  TComponent);
 begin
   inherited Create(owner);
+  //if System.RandSeed = 0 then Randomize;
   Self.gameReady := false;
 end;
 
@@ -98,13 +99,9 @@ procedure TForm1.diceThrowEvent(Sender: TObject);
 var
   dice : integer;
 begin
-  Randomize;
   dice := StrToIntDef(Self.diceEdit.Text, 0);
-  if ((dice < 1) or (dice > 6)) then
-     begin
-       dice := RandomRange(1, 6);
-       Self.diceEdit.Text := IntToStr(dice);
-     end;
+  dice := Random(5) + 1;
+  Self.diceEdit.Text := IntToStr(dice);
   Self.processThrown;
 end;
 
