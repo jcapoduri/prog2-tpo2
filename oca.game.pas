@@ -25,6 +25,7 @@ type
   tOcaPlayerInfo = record
                      overTurns   : integer;
                      currentCell : oca.space.idxRange;
+                     currentNumb : integer;
                    end;
   tOcaGameData    = record
                       path      : tListOcaSpace;
@@ -75,8 +76,8 @@ begin
   this.control.playersNbr := players;
   for i := 1 to players do
     begin
-      this.control.players[i].overTurns  := 0;
-      //oca.space.search(this.data.path, 1, idx);
+      this.control.players[i].overTurns   := 0;
+      this.control.players[i].currentNumb := 1;
       this.control.players[i].currentCell := oca.space.first(this.data.path);
     end;
 
@@ -108,7 +109,7 @@ begin
       item       := oca.modifiers.generateModifier(this.data.rules, Goose, cellNumber);
       insertCell(this, item);
     end;
-  until cellNumber >= gooseCells do
+  until cellNumber >= gooseCells;
 end;
 
 procedure generateBridges(var this : tOcaGame);
@@ -231,12 +232,12 @@ begin
   item.cellNmb    := number;
   item.modifier   := None;
 
-  oca.space.search(this.data.path, number, tile);
+  //oca.space.search(this.data.path, number, tile);
   //update player info
   for i := 1 to this.control.playersNbr do
     begin
       player := this.control.players[i];
-      if tile = player.currentCell then
+      if number = player.currentNumb then
         item.players[i] := true;
     end;
 
@@ -366,7 +367,11 @@ begin
   if oca.modifiers.nextAfter(this.data.rules, modifier, i) then
     oca.space.search(this.data.path, i, player.currentCell)
   else
-    oca.space.search(this.data.path, searchStackByModifier(this, Bridge), player.currentCell)
+    begin
+      i := searchStackByModifier(this, Bridge);
+      oca.space.search(this.data.path, i, player.currentCell);
+    end;
+  player.currentNumb := i;
 end;
 
 procedure reactToLabyrinth (var this : tOcaGame; var player: tOcaPlayerInfo);
@@ -383,12 +388,14 @@ begin
     begin
       player.currentCell := oca.space.prev(this.data.path, player.currentCell);
       item := oca.space.get(this.data.path, player.currentCell);
+      player.currentNumb := item.cell;
     end;
 end;
 
 procedure reactToDeath     (var this : tOcaGame; var player: tOcaPlayerInfo);
 begin
   player.currentCell := oca.space.first(this.data.path);
+  player.currentNumb := 1;
 end;
 
 
@@ -418,6 +425,7 @@ var
   i           : integer;
   tempIdx     : oca.space.idxRange;
   playerInfo  : tOcaPlayerInfo;
+  item        : tOcaSpace;
 begin
   moveForward := true;
   playerInfo  := this.control.players[player];
@@ -432,6 +440,8 @@ begin
       else
         tempIdx := oca.space.prev(this.data.path, playerInfo.currentCell);
       playerInfo.currentCell := tempIdx;
+      item                   := oca.space.get(this.data.path, playerInfo.currentCell);
+      playerInfo.currentNumb := item.cell;
     end;
   this.control.players[player] := playerInfo;
 end;
