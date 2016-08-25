@@ -101,7 +101,7 @@ var
   cellNumber    : integer;
   item          : tOcaModifier;
 begin
-  gooseCells := 1
+  gooseCells := 1;
   cellNumber := NMBSPACES;
   repeat
     begin
