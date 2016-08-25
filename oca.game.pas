@@ -101,11 +101,11 @@ var
   cellNumber    : integer;
   item          : tOcaModifier;
 begin
-  gooseCells := NMBSPACES - 1;
-  cellNumber := 0;
+  gooseCells := 1
+  cellNumber := NMBSPACES;
   repeat
     begin
-      cellNumber := cellNumber + Random(1) + 4;
+      cellNumber := cellNumber - Random(2) - 4;
       item       := oca.modifiers.generateModifier(this.data.rules, Goose, cellNumber);
       insertCell(this, item);
     end;
@@ -508,7 +508,7 @@ begin
             current.overTurns := current.overTurns + 1;
             this.control.players[next] := current;
           end
-        else 
+        else
           found := true;
       end;
   this.control.currentPlayer := next;
