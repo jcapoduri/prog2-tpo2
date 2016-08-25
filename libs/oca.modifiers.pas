@@ -52,12 +52,27 @@ begin
   getControlRecord := Rc;
 end;
 
+function quickGetControlRecord(var this : tStackOca) : tControlRecord;
+var
+  Rc : tControlRecord;
+begin
+  seek (this.control, 0);
+  read (this.control, Rc);
+  quickGetControlRecord := Rc;
+end;
+
 procedure setControlRecord(var this : tStackOca; Rc : tControlRecord);
 begin
   reset(this.control);
   seek (this.control, 0);
   write(this.control, Rc);
   close(this.control);
+end;
+
+procedure quickSetControlRecord(var this : tStackOca; Rc : tControlRecord);
+begin
+  seek (this.control, 0);
+  write(this.control, Rc);
 end;
 
 procedure loadStack (var this : tStackOca; path, filename : string);
@@ -120,6 +135,14 @@ begin
   isEmpty := Rc.first = NULLIDX;
 end;
 
+function  quickIsEmpty (var this : tStackOca) : Boolean;
+var
+  Rc : tControlRecord;
+begin
+  Rc           := quickGetControlRecord(this);
+  quickIsEmpty := Rc.first = NULLIDX;
+end;
+
 // inner function
 function  get (var this : tStackOca; pos : idxRange) : tOcaModifier;
 var
@@ -132,12 +155,27 @@ begin
   get := item;
 end;
 
+function  quickGet (var this : tStackOca; pos : idxRange) : tOcaModifier;
+var
+  item: tOcaModifier;
+begin
+  seek  (this.data, pos);
+  read  (this.data, item);
+  quickGet := item;
+end;
+
 procedure update (var this : tStackOca; pos : idxRange; var item : tOcaModifier);
 begin
   reset (this.data);
   seek  (this.data, pos);
   write (this.data, item);
   close (this.data);
+end;
+
+procedure quickUpdate (var this : tStackOca; pos : idxRange; var item : tOcaModifier);
+begin
+  seek  (this.data, pos);
+  write (this.data, item);
 end;
 
 function append (var this : tStackOca; var item : tOcaModifier) : idxRange;
@@ -170,6 +208,34 @@ begin
   append := pos;
 end;
 
+function quickAppend (var this : tStackOca; var item : tOcaModifier) : idxRange;
+var
+  Rc      : tControlRecord;
+  pos     : idxRange;
+  auxItem : tOcaModifier;
+begin
+  Rc  := quickGetControlRecord(this);
+  pos := NULLIDX;
+  if Rc.erased = NULLIDX then
+    begin
+      pos := filesize(this.data);
+      seek(this.data, pos);
+      item.next := NULLIDX;
+      write(this.data, item);
+    end
+  else
+    begin
+      pos       := Rc.erased;
+      auxItem   := quickGet(this, pos);
+      Rc.erased := auxItem.next;
+      item.next := NULLIDX;
+
+      quickUpdate(this, pos, item);
+      quickSetControlRecord(this, Rc);
+    end;
+  quickAppend := pos;
+end;
+
 procedure push (var this : tStackOca; item : tOcaModifier);
 var
   auxPos : idxRange;
@@ -192,6 +258,30 @@ begin
     end;
 
   setControlRecord(this, Rc);
+end;
+
+procedure quickPush (var this : tStackOca; item : tOcaModifier);
+var
+  auxPos : idxRange;
+  Rc     : tControlRecord;
+begin
+  Rc := quickGetControlRecord(this);
+  if Rc.first = NULLIDX then
+    begin
+      auxPos   := quickAppend(this, item);
+      Rc       := quickGetControlRecord(this);
+      Rc.first := auxPos;
+    end
+  else
+    begin
+      auxPos      := quickAppend(this, item);
+      Rc          := quickGetControlRecord(this);
+      item.next   := Rc.first;
+      Rc.first    := auxPos;
+      quickUpdate(this, auxPos, item);
+    end;
+
+  quickSetControlRecord(this, Rc);
 end;
 
 function  peek (var this : tStackOca) : tOcaModifier;
@@ -230,24 +320,57 @@ begin
     end;
 end;
 
-function  search (var this : tStackOca; cell : integer; var modifier : tModifiers) : boolean;
+function  quickPop (var this : tStackOca) : tOcaModifier;
 var
-  item : tOcaModifier;
+  pos, auxPos : idxRange;
+  auxItem     : tOcaModifier;
+  Rc          : tControlRecord;
+begin
+  Rc := quickGetControlRecord(this);
+  if not (Rc.first = NULLIDX) then
+    begin
+      auxItem      := quickGet(this, Rc.first);
+      auxPos       := auxItem.next;
+      auxItem.next := Rc.erased;
+      quickUpdate(this, Rc.first, auxItem);
+
+      Rc.erased    := Rc.first;
+      Rc.first     := auxPos;
+      quickSetControlRecord(this, Rc);
+      auxItem.next := NULLIDX;
+      quickPop     := auxItem;
+    end;
+end;
+
+function  quickSearch (var this : tStackOca; cell : integer; var modifier : tModifiers) : boolean;
+var
+  item   : tOcaModifier;
 begin
   modifier := None;
-  item := pop(this);
+  item := quickPop(this);
   if item.cell = cell then
     begin
-      search := true;
+      quickSearch := true;
       modifier := item.modifier;
     end
   else
-    if isEmpty(this) then
-      search := false
+    if quickIsEmpty(this) then
+      quickSearch := false
     else
-      search := search(this, cell, modifier);
+      quickSearch := quickSearch(this, cell, modifier);
 
-  push(this, item);
+  quickPush(this, item);
+end;
+
+function  search (var this : tStackOca; cell : integer; var modifier : tModifiers) : boolean;
+var
+  found : boolean;
+begin
+  reset(this.control);
+  reset(this.data);
+  found := quickSearch(this, cell, modifier);
+  close(this.data);
+  close(this.control);
 end;
 
 function  innerNextAfter (var this : tStackOca; modifier : tOcaModifier; var cellnumber : integer; alreadyFound : boolean) : boolean;
