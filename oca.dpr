@@ -14,6 +14,7 @@ var
   ui   : mainOCA.TForm1;
 
 begin
+  Randomize;
   Application.Initialize;
   oca.game.create(game);
   oca.game.generate(game);

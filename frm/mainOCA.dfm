@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 400
-  Top = 237
+  Left = 448
+  Top = 164
   Width = 760
   Height = 552
   Caption = 'OCA'
@@ -27,6 +27,7 @@ object Form1: TForm1
     FixedRows = 0
     ScrollBars = ssNone
     TabOrder = 0
+    OnDrawCell = renderTile
   end
   object gameGroupBox: TGroupBox
     Left = 512
@@ -131,14 +132,6 @@ object Form1: TForm1
       Caption = 'Tirar'
       TabOrder = 2
       OnClick = diceThrowEvent
-    end
-    object nextTurnButton: TButton
-      Left = 88
-      Top = 160
-      Width = 121
-      Height = 25
-      Caption = 'Sigiente Turno'
-      TabOrder = 3
     end
   end
   object BitBtn1: TBitBtn
