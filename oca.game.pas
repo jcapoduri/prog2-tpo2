@@ -100,13 +100,15 @@ var
   cellNumber    : integer;
   item          : tOcaModifier;
 begin
-  gooseCells := (NMBSPACES div 6) - 1;
-  for i:= gooseCells downto 0 do
+  gooseCells := NMBSPACES - 1;
+  cellNumber := 0;
+  repeat
     begin
-      cellNumber := Random(gooseCells) + (i * 6);
+      cellNumber := cellNumber + Random(1) + 4;
       item       := oca.modifiers.generateModifier(this.data.rules, Goose, cellNumber);
       insertCell(this, item);
     end;
+  until cellNumber >= gooseCells do
 end;
 
 procedure generateBridges(var this : tOcaGame);
@@ -217,7 +219,7 @@ end;
 function getCellInfo (var this: tOcaGame; number: integer) : tOcaCellInfo;
 var
   i        : integer;
-  tile     : tOcaSpace;
+  tile     : oca.space.idxRange;
   item     : tOcaCellInfo;
   player   : tOcaPlayerInfo;
   modifier : tModifiers;
@@ -229,12 +231,12 @@ begin
   item.cellNmb    := number;
   item.modifier   := None;
 
+  oca.space.search(this.data.path, number, tile);
   //update player info
   for i := 1 to this.control.playersNbr do
     begin
       player := this.control.players[i];
-      tile   := oca.space.get(this.data.path, player.currentCell);
-      if tile.cell = number then
+      if tile = player.currentCell then
         item.players[i] := true;
     end;
 

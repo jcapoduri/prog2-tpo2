@@ -24,7 +24,6 @@ type
     diceThrowButton: TButton;
     Label4: TLabel;
     infoLabel: TLabel;
-    nextTurnButton: TButton;
     procedure startButtonClick(Sender: TObject);
     procedure diceThrowEvent(Sender: TObject);
     procedure renderTile(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
@@ -150,9 +149,13 @@ var
   i          : integer;
   tileInfo   : tOcaCellInfo;
 begin
-  if Self.gameReady then begin
-  tileNumber := StrToInt(Self.tableBoardGrid.Cells[ACol, ARow]);
+  tileNumber := StrToIntDef(Self.tableBoardGrid.Cells[ACol, ARow], 0);
+  if Self.gameReady and (tileNumber <> 0) then begin
+  OutputDebugString('init');
+  OutputDebugString(PChar(IntToStr(DateUtils.MilliSecondOf(Now))));
+
   tileInfo   := oca.game.getCellInfo(Self.ocaGame, tileNumber);
+  OutputDebugString(PChar(IntToStr(DateUtils.MilliSecondOf(Now))));
   with Self.tableBoardGrid.Canvas do
   begin
     //paint background
@@ -163,7 +166,7 @@ begin
       Inn       : Brush.Color := clLtGray;
       Prison    : Brush.Color := clGray;
       Pit       : Brush.Color := clDkGray;
-      Labyrinth : Brush.Color := clNavy;
+      Labyrinth : Brush.Color := clLime;
       Death     : Brush.Color := clRed;
       else Brush.Color := clWhite;
     end;
@@ -172,10 +175,12 @@ begin
     Brush.Color := clWhite;
     Font.Color := clBlack;
     Font.Name := 'Tahoma';
-    Font.Size := 5;
+    Font.Size := 7;
     TextOut( Rect.Left + 5, Rect.Top + 5, IntToStr(tileNumber));
     for i := 1 to 4 do
-      if tileInfo.players[i] then TextOut(Rect.Left + 5, (Rect.Bottom - 40) + 7*i, 'Jugador ' + IntToStr(i));
+      if tileInfo.players[i] then TextOut(Rect.Left + 5, (Rect.Bottom - 45) + 9*i, 'Jug. ' + IntToStr(i));
+    OutputDebugString(PChar(IntToStr(DateUtils.MilliSecondOf(Now))));
+    OutputDebugString('end.')
   end;
   end;//if
 end;
