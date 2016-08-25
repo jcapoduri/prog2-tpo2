@@ -45,7 +45,6 @@ type
   function  first         (var this : tQueueOcaMvmt) : idxRange;
   function  last          (var this : tQueueOcaMvmt) : idxRange;
   function  next          (var this : tQueueOcaMvmt; pos : idxRange) : idxRange;
-  //function  search        (var this : tQueueOcaMvmt; key : tKey; var pos : idxRange) : boolean;
 
   function  isValidPos    (var this : tQueueOcaMvmt; pos : idxRange) : boolean;
 
@@ -239,28 +238,24 @@ begin
       setControlRecord(this, Rc);
     end
   else
-    //if not search(this, item.number, pos) then
-      begin
-        auxPos  := append(this, item);
+    begin
+      auxPos  := append(this, item);
 
-        if pos = NULLIDX then
-          Rc.first := auxPos;
-
-        if pos = Rc.last then
-          setControlRecord(this, Rc);
-
-        auxItem := get(this, pos);
-        pos     := auxItem.next;
-
-        auxItem.next := auxPos;
-        update(this, auxPos, auxItem);
-
-        item.next := pos;
-        update(this, pos, item);
-
-        Rc.count := Rc.count + 1;
+      if pos = Rc.last then
         setControlRecord(this, Rc);
-      end;
+
+      auxItem := get(this, pos);
+      pos     := auxItem.next;
+
+      auxItem.next := auxPos;
+      update(this, auxPos, auxItem);
+
+      item.next := pos;
+      update(this, pos, item);
+
+      Rc.count := Rc.count + 1;
+      setControlRecord(this, Rc);
+    end;
 end;
 
 procedure deletePos (var this : tQueueOcaMvmt; pos : idxRange);

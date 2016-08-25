@@ -99,7 +99,7 @@ var
   dice : integer;
 begin
   dice := StrToIntDef(Self.diceEdit.Text, 0);
-  dice := Random(5) + 1;
+  dice := Random(6) + 1;
   Self.diceEdit.Text := IntToStr(dice);
   Self.processThrown;
 end;

@@ -25,7 +25,6 @@ type
   tOcaPlayerInfo = record
                      overTurns   : integer;
                      currentCell : oca.space.idxRange;
-                     currentNumb : integer;
                    end;
   tOcaGameData    = record
                       path      : tListOcaSpace;
@@ -77,7 +76,6 @@ begin
   for i := 1 to players do
     begin
       this.control.players[i].overTurns   := 0;
-      this.control.players[i].currentNumb := 1;
       this.control.players[i].currentCell := oca.space.first(this.data.path);
     end;
 
@@ -101,15 +99,15 @@ var
   cellNumber    : integer;
   item          : tOcaModifier;
 begin
-  gooseCells := 1;
+  gooseCells := 3;
   cellNumber := NMBSPACES;
   repeat
     begin
-      cellNumber := cellNumber - Random(2) - 4;
+      cellNumber := cellNumber - (Random(2) + 4);
       item       := oca.modifiers.generateModifier(this.data.rules, Goose, cellNumber);
       insertCell(this, item);
     end;
-  until cellNumber >= gooseCells;
+  until cellNumber <= gooseCells;
 end;
 
 procedure generateBridges(var this : tOcaGame);
@@ -121,7 +119,7 @@ begin
   bridgesInserted := false;
   while not bridgesInserted do
     begin
-      cell1 := random(NMBSPACES - 6);
+      cell1 := random(NMBSPACES - 7);
       cell2 := cell1 + 6;
       if ( not oca.modifiers.existsCell(this.data.rules, cell1) ) and
          ( not oca.modifiers.existsCell(this.data.rules, cell2) ) then
@@ -144,7 +142,7 @@ begin
   dicesInserted := false;
   while not dicesInserted do
     begin
-      space := random(NMBSPACES - 20) + 20; //to have a random number upper than 20 but below NMBSPACES
+      space := random(NMBSPACES - 21) + 20; //to have a random number upper than 20 but below NMBSPACES
       cell1 := random(NMBSPACES - space);
       cell2 := cell1 + space;
       if ( not oca.modifiers.existsCell(this.data.rules, cell1) ) and
@@ -168,7 +166,7 @@ begin
   inserted := false;
   while not inserted do
     begin
-      cell := random(NMBSPACES - lowerLimit) + lowerLimit;
+      cell := random(NMBSPACES - (lowerLimit + 1)) + lowerLimit;
       if not oca.modifiers.existsCell(this.data.rules, cell) then
          begin
            item := oca.modifiers.generateModifier(this.data.rules, modifier, cell);
@@ -232,12 +230,12 @@ begin
   item.cellNmb    := number;
   item.modifier   := None;
 
-  //oca.space.search(this.data.path, number, tile);
+  oca.space.search(this.data.path, number, tile);
   //update player info
   for i := 1 to this.control.playersNbr do
     begin
       player := this.control.players[i];
-      if number = player.currentNumb then
+      if tile = player.currentCell then
         item.players[i] := true;
     end;
 
@@ -345,9 +343,7 @@ begin
   item     := oca.space.get(this.data.path, player.currentCell);
   modifier := oca.modifiers.generateModifier(this.data.rules, Goose, item.cell);
   if oca.modifiers.nextAfter(this.data.rules, modifier, newTile) then
-    begin
-      oca.space.search(this.data.path, newTile, player.currentCell);
-    end;
+     oca.space.search(this.data.path, newTile, player.currentCell);
   player.overTurns := player.overTurns + 1;
 end;
 
@@ -371,7 +367,6 @@ begin
       i := searchStackByModifier(this, Bridge);
       oca.space.search(this.data.path, i, player.currentCell);
     end;
-  player.currentNumb := i;
 end;
 
 procedure reactToLabyrinth (var this : tOcaGame; var player: tOcaPlayerInfo);
@@ -381,21 +376,17 @@ var
   modifier : tModifiers;
 begin
   //go back 12 positions
-  for i := 0 to 12 do player.currentCell := oca.space.prev(this.data.path, player.currentCell);
+  for i := 1 to 12 do player.currentCell := oca.space.prev(this.data.path, player.currentCell);
   //keep going back until normal position found
   item := oca.space.get(this.data.path, player.currentCell);
   while oca.modifiers.search(this.data.rules, item.cell, modifier) do
-    begin
       player.currentCell := oca.space.prev(this.data.path, player.currentCell);
-      item := oca.space.get(this.data.path, player.currentCell);
-      player.currentNumb := item.cell;
-    end;
+
 end;
 
 procedure reactToDeath     (var this : tOcaGame; var player: tOcaPlayerInfo);
 begin
   player.currentCell := oca.space.first(this.data.path);
-  player.currentNumb := 1;
 end;
 
 
@@ -440,8 +431,6 @@ begin
       else
         tempIdx := oca.space.prev(this.data.path, playerInfo.currentCell);
       playerInfo.currentCell := tempIdx;
-      item                   := oca.space.get(this.data.path, playerInfo.currentCell);
-      playerInfo.currentNumb := item.cell;
     end;
   this.control.players[player] := playerInfo;
 end;

@@ -350,8 +350,8 @@ begin
   item := quickPop(this);
   if item.cell = cell then
     begin
-      quickSearch := true;
       modifier := item.modifier;
+      quickSearch := true;
     end
   else
     if quickIsEmpty(this) then
@@ -371,6 +371,7 @@ begin
   found := quickSearch(this, cell, modifier);
   close(this.data);
   close(this.control);
+  search := found;
 end;
 
 function  innerNextAfter (var this : tStackOca; modifier : tOcaModifier; var cellnumber : integer; alreadyFound : boolean) : boolean;
