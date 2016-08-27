@@ -380,7 +380,10 @@ begin
   //keep going back until normal position found
   item := oca.space.get(this.data.path, player.currentCell);
   while oca.modifiers.search(this.data.rules, item.cell, modifier) do
+    begin
       player.currentCell := oca.space.prev(this.data.path, player.currentCell);
+      item := oca.space.get(this.data.path, player.currentCell);
+    end;
 
 end;
 
