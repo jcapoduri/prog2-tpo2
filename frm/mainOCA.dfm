@@ -1,8 +1,8 @@
 object Form1: TForm1
-  Left = 407
-  Top = 129
-  Width = 919
-  Height = 558
+  Left = 711
+  Top = 173
+  Width = 1077
+  Height = 560
   Caption = 'OCA'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,54 +15,6 @@ object Form1: TForm1
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
-  object Shape1: TShape
-    Left = 752
-    Top = 24
-    Width = 49
-    Height = 49
-  end
-  object Shape2: TShape
-    Left = 752
-    Top = 360
-    Width = 49
-    Height = 49
-  end
-  object Shape3: TShape
-    Left = 752
-    Top = 416
-    Width = 49
-    Height = 49
-  end
-  object Shape4: TShape
-    Left = 752
-    Top = 80
-    Width = 49
-    Height = 49
-  end
-  object Shape5: TShape
-    Left = 752
-    Top = 136
-    Width = 49
-    Height = 49
-  end
-  object Shape6: TShape
-    Left = 752
-    Top = 192
-    Width = 49
-    Height = 49
-  end
-  object Shape7: TShape
-    Left = 752
-    Top = 248
-    Width = 49
-    Height = 49
-  end
-  object Shape8: TShape
-    Left = 752
-    Top = 304
-    Width = 49
-    Height = 49
-  end
   object Label6: TLabel
     Left = 424
     Top = 272
@@ -77,53 +29,19 @@ object Form1: TForm1
     Height = 13
     Caption = 'Label7'
   end
-  object Label8: TLabel
-    Left = 816
-    Top = 24
-    Width = 3
+  object Label16: TLabel
+    Left = 752
+    Top = 16
+    Width = 59
     Height = 13
+    Caption = 'Movimientos'
   end
-  object Label9: TLabel
-    Left = 814
-    Top = 80
-    Width = 3
+  object Label17: TLabel
+    Left = 904
+    Top = 16
+    Width = 139
     Height = 13
-  end
-  object Label10: TLabel
-    Left = 808
-    Top = 144
-    Width = 3
-    Height = 13
-  end
-  object Label11: TLabel
-    Left = 808
-    Top = 200
-    Width = 3
-    Height = 13
-  end
-  object Label12: TLabel
-    Left = 808
-    Top = 256
-    Width = 3
-    Height = 13
-  end
-  object Label13: TLabel
-    Left = 808
-    Top = 312
-    Width = 3
-    Height = 13
-  end
-  object Label14: TLabel
-    Left = 808
-    Top = 368
-    Width = 3
-    Height = 13
-  end
-  object Label15: TLabel
-    Left = 808
-    Top = 424
-    Width = 3
-    Height = 13
+    Caption = 'Movimientos de la repeticion:'
   end
   object tableBoardGrid: TStringGrid
     Left = 8
@@ -144,8 +62,8 @@ object Form1: TForm1
     Left = 512
     Top = 8
     Width = 233
-    Height = 161
-    Caption = 'Juego'
+    Height = 81
+    Caption = 'Inicio:'
     TabOrder = 1
     object Label1: TLabel
       Left = 8
@@ -157,7 +75,7 @@ object Form1: TForm1
     object playersComboBox: TComboBox
       Left = 72
       Top = 24
-      Width = 145
+      Width = 153
       Height = 21
       ItemHeight = 13
       ItemIndex = 0
@@ -169,8 +87,8 @@ object Form1: TForm1
         '4 Jugadores')
     end
     object startButton: TButton
-      Left = 144
-      Top = 128
+      Left = 152
+      Top = 48
       Width = 75
       Height = 25
       Caption = 'Iniciar Juego'
@@ -180,79 +98,92 @@ object Form1: TForm1
   end
   object ingameGroupBox: TGroupBox
     Left = 512
-    Top = 176
+    Top = 96
     Width = 233
-    Height = 201
-    Caption = 'In game'
+    Height = 153
+    Caption = 'Juego'
     Enabled = False
     TabOrder = 2
     object Label2: TLabel
       Left = 8
-      Top = 24
+      Top = 16
       Width = 76
       Height = 13
       Caption = 'Jugador Actual:'
     end
     object Label3: TLabel
       Left = 48
-      Top = 64
+      Top = 56
       Width = 34
       Height = 13
       Caption = 'Tirada:'
     end
     object playerLabel: TLabel
       Left = 88
-      Top = 24
-      Width = 3
+      Top = 16
+      Width = 25
       Height = 13
     end
     object Label4: TLabel
       Left = 56
-      Top = 96
+      Top = 32
       Width = 24
       Height = 13
       Caption = 'Info:'
     end
     object infoLabel: TLabel
       Left = 88
-      Top = 96
+      Top = 32
       Width = 90
       Height = 13
       Caption = '                              '
-    end
-    object Button3: TButton
-      Left = 112
-      Top = 160
-      Width = 115
-      Height = 25
-      Caption = 'Replicar Juego actual'
-      TabOrder = 0
-      OnClick = Button3Click
     end
     object diceEdit: TEdit
       Left = 88
       Top = 56
       Width = 33
       Height = 21
-      TabOrder = 1
+      TabOrder = 0
     end
     object diceThrowButton: TButton
-      Left = 136
+      Left = 144
       Top = 56
       Width = 75
       Height = 25
       Caption = 'Tirar'
-      TabOrder = 2
+      Enabled = False
+      TabOrder = 1
       OnClick = diceThrowEvent
     end
-    object Button1: TButton
-      Left = 112
-      Top = 128
-      Width = 113
+    object toManualButton: TButton
+      Left = 128
+      Top = 88
+      Width = 97
       Height = 25
-      Caption = 'Ir a Modo Manual'
+      Caption = 'Modo Manual'
+      Enabled = False
+      TabOrder = 2
+      OnClick = toManualButtonClick
+    end
+    object replyButton: TButton
+      Left = 112
+      Top = 120
+      Width = 115
+      Height = 25
+      Caption = 'Replicar Juego actual'
+      Enabled = False
       TabOrder = 3
-      OnClick = Button1Click
+      OnClick = replyButtonClick
+    end
+    object toNormalButton: TButton
+      Left = 8
+      Top = 88
+      Width = 97
+      Height = 25
+      Caption = 'Modo Normal'
+      Enabled = False
+      TabOrder = 4
+      OnClick = toNormalButtonClick
     end
   end
   object BitBtn1: TBitBtn
@@ -264,44 +195,136 @@ object Form1: TForm1
     TabOrder = 3
     Kind = bkClose
   end
+  object movementsText: TMemo
+    Left = 752
+    Top = 32
+    Width = 145
+    Height = 481
+    Enabled = False
+    TabOrder = 4
+  end
+  object mimicMovementsText: TMemo
+    Left = 904
+    Top = 32
+    Width = 145
+    Height = 479
+    TabOrder = 5
+  end
   object GroupBox1: TGroupBox
     Left = 512
-    Top = 384
+    Top = 320
     Width = 233
-    Height = 97
-    Caption = 'Modo Manual'
-    TabOrder = 4
-    object Label5: TLabel
+    Height = 161
+    Caption = 'Leyenda'
+    TabOrder = 6
+    object Shape1: TShape
       Left = 8
-      Top = 24
-      Width = 76
+      Top = 16
+      Width = 25
+      Height = 25
+      Brush.Color = clYellow
+    end
+    object Shape2: TShape
+      Left = 8
+      Top = 48
+      Width = 25
+      Height = 25
+      Brush.Color = clSkyBlue
+    end
+    object Shape3: TShape
+      Left = 8
+      Top = 80
+      Width = 25
+      Height = 25
+    end
+    object Shape4: TShape
+      Left = 8
+      Top = 112
+      Width = 25
+      Height = 25
+    end
+    object Shape5: TShape
+      Left = 120
+      Top = 16
+      Width = 25
+      Height = 25
+      Brush.Color = clGray
+    end
+    object Shape6: TShape
+      Left = 120
+      Top = 48
+      Width = 25
+      Height = 25
+    end
+    object Shape7: TShape
+      Left = 120
+      Top = 80
+      Width = 25
+      Height = 25
+      Brush.Color = clLime
+    end
+    object Shape8: TShape
+      Left = 120
+      Top = 112
+      Width = 25
+      Height = 25
+      Brush.Color = clRed
+    end
+    object Label8: TLabel
+      Left = 35
+      Top = 20
+      Width = 78
       Height = 13
-      Caption = 'Jugador Actual:'
+      Caption = 'Casilla de la Oca'
     end
-    object Button2: TButton
-      Left = 112
-      Top = 64
-      Width = 113
-      Height = 25
-      Caption = 'Volver a Modo Normal'
-      TabOrder = 0
-      OnClick = Button2Click
+    object Label9: TLabel
+      Left = 37
+      Top = 116
+      Width = 68
+      Height = 13
+      Caption = 'Casilla Posada'
     end
-    object Button4: TButton
-      Left = 168
-      Top = 16
-      Width = 49
-      Height = 25
-      Caption = 'Tirar'
-      TabOrder = 1
-      OnClick = Button4Click
+    object Label10: TLabel
+      Left = 153
+      Top = 20
+      Width = 64
+      Height = 13
+      Caption = 'Casilla Prision'
     end
-    object Edit1: TEdit
-      Left = 104
-      Top = 16
-      Width = 49
-      Height = 21
-      TabOrder = 2
+    object Label11: TLabel
+      Left = 34
+      Top = 84
+      Width = 63
+      Height = 13
+      Caption = 'Casilla Dados'
+    end
+    object Label12: TLabel
+      Left = 153
+      Top = 52
+      Width = 56
+      Height = 13
+      Caption = 'Casilla Pozo'
+    end
+    object Label13: TLabel
+      Left = 147
+      Top = 84
+      Width = 78
+      Height = 13
+      Caption = 'Casilla Laberinto'
+    end
+    object Label14: TLabel
+      Left = 150
+      Top = 116
+      Width = 67
+      Height = 13
+      Caption = 'Casilla Muerte'
+    end
+    object Label15: TLabel
+      Left = 38
+      Top = 52
+      Width = 67
+      Height = 13
+      Caption = 'Casilla Puente'
     end
   end
   object Timer1: TTimer

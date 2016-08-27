@@ -18,19 +18,23 @@ type
     startButton: TButton;
     Label2: TLabel;
     Label3: TLabel;
-    Button3: TButton;
     BitBtn1: TBitBtn;
     playerLabel: TLabel;
     diceEdit: TEdit;
     diceThrowButton: TButton;
     Label4: TLabel;
     infoLabel: TLabel;
+    toManualButton: TButton;
+    Label6: TLabel;
+    Label7: TLabel;
+    Timer1: TTimer;
+    replyButton: TButton;
+    movementsText: TMemo;
+    mimicMovementsText: TMemo;
+    Label16: TLabel;
+    Label17: TLabel;
+    toNormalButton: TButton;
     GroupBox1: TGroupBox;
-    Button1: TButton;
-    Button2: TButton;
-    Button4: TButton;
-    Edit1: TEdit;
-    Label5: TLabel;
     Shape1: TShape;
     Shape2: TShape;
     Shape3: TShape;
@@ -39,8 +43,6 @@ type
     Shape6: TShape;
     Shape7: TShape;
     Shape8: TShape;
-    Label6: TLabel;
-    Label7: TLabel;
     Label8: TLabel;
     Label9: TLabel;
     Label10: TLabel;
@@ -49,15 +51,13 @@ type
     Label13: TLabel;
     Label14: TLabel;
     Label15: TLabel;
-    Timer1: TTimer;
     procedure startButtonClick(Sender: TObject);
     procedure diceThrowEvent(Sender: TObject);
     procedure renderTile(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
       State: TGridDrawState);
-    procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
+    procedure toManualButtonClick(Sender: TObject);
+    procedure toNormalButtonClick(Sender: TObject);
+    procedure replyButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ReplyMovement(Sender: TObject);
   protected
@@ -68,6 +68,13 @@ type
     procedure renderMatrix();
     procedure processThrown();
     procedure processMovement();
+    // UI management
+    procedure setUiForStartGame();
+    procedure setUiForInGame();
+    procedure setUiForEndGame();
+    procedure setUiForReplyGame();
+    procedure setUiForNormalGame();
+    procedure setUiForManualGame();
   public
     Constructor new      (owner:  TComponent);
     procedure   initGame (var game : oca.game.tOcaGame);
@@ -96,12 +103,13 @@ begin
   //if System.RandSeed = 0 then Randomize;
   Self.gameReady := false;
   Self.justPaint := false;
+  Self.setUiForStartGame;
 end;
 
 procedure TForm1.updateUI;
 begin
   Self.playerLabel.Caption := IntToStr(oca.game.currentPlayer(Self.ocaGame));
-  Self.Label5.Caption      := 'Jugador Actual:' + IntToStr(oca.game.currentPlayer(self.ocaGame));
+  //Self.Label5.Caption      := 'Jugador Actual:' + IntToStr(oca.game.currentPlayer(self.ocaGame));
   Self.renderMatrix();
 end;
 
@@ -109,8 +117,9 @@ procedure TForm1.startButtonClick(Sender: TObject);
 var
   players: Integer;
 begin
-  Self.gameGroupBox.Enabled   := false;
-  Self.ingameGroupBox.Enabled := true;
+  Self.gameReady := false;
+  Self.playersComboBox.Enabled := false;
+  Self.startButton.Enabled     := true;
   players := 2;
   if (Self.playersComboBox.Text = '3 Jugadores') then players := 3;
   if (Self.playersComboBox.Text = '4 Jugadores') then players := 4;
@@ -118,6 +127,7 @@ begin
   oca.game.generate(Self.ocaGame);
   setupGame(Self.ocaGame, players);
   Self.gameReady := true;
+  Self.setUiForInGame;
   updateUI;
 end;
 
@@ -135,9 +145,12 @@ procedure TForm1.diceThrowEvent(Sender: TObject);
 var
   dice : integer;
 begin
-  dice := StrToIntDef(Self.diceEdit.Text, 0);
-  dice := Random(6) + 1;
-  Self.diceEdit.Text := IntToStr(dice);
+  if Self.toManualButton.Enabled then //normal mode activated
+    begin
+      dice := StrToIntDef(Self.diceEdit.Text, 0);
+      dice := Random(6) + 1;
+      Self.diceEdit.Text := IntToStr(dice);
+    end;
   Self.processThrown;
 end;
 
@@ -160,12 +173,7 @@ begin
   if oca.game.currentPlayerWon(Self.ocaGame) then
    begin
     MessageDlg('Has ganado el juego de la oca!', mtInformation, [mbOk], 0);
-    diceThrowButton.Enabled:=false;
-    InGameGroupBox.Enabled := true;
-    Button1.Enabled:=False;
-    Button2.Enabled:=false;
-    Button4.Enabled:=false;
-    button3.Enabled:=true;
+    Self.setUiForEndGame;
    end
   else
     begin
@@ -180,11 +188,14 @@ var
   dice   : integer;
   current: integer;
 begin
-  dice    := StrToInt(Self.diceEdit.Text);
-  current := oca.game.currentPlayer(Self.ocaGame);
-  oca.game.movePlayer(Self.ocaGame, current, dice);
-  Self.updateUI;
-  Self.processMovement;
+  dice    := StrToIntDef(Self.diceEdit.Text, 0);
+  if dice > 0 then
+    begin
+      current := oca.game.currentPlayer(Self.ocaGame);
+      oca.game.movePlayer(Self.ocaGame, current, dice);
+      Self.updateUI;
+      Self.processMovement;
+    end;
 end;
 
 procedure TForm1.renderTile(Sender: TObject; ACol, ARow: Integer;
@@ -230,37 +241,17 @@ begin
   end;//if
 end;
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TForm1.toManualButtonClick(Sender: TObject);
 begin
-  InGameGroupBox.Enabled:=false;
-  GroupBox1.Enabled:=true;
-  edit1.SetFocus;
-
+  Self.setUiForManualGame;
 end;
 
-procedure TForm1.Button2Click(Sender: TObject);
+procedure TForm1.toNormalButtonClick(Sender: TObject);
 begin
-  groupBox1.Enabled:=false;
-  InGameGroupBox.Enabled:=true
+  Self.setUiForNormalGame;
 end;
 
-procedure TForm1.Button4Click(Sender: TObject);
-var
-  dice, current:integer;
-
-begin
-  dice   :=StrToIntDef(edit1.Text, 0);
-  IF dice >0 then
-   begin
-    current:=oca.game.currentPlayer(self.ocaGame);
-    oca.game.movePlayer(self.ocaGame,current,dice);
-    self.updateUI;
-    self.processMovement;
-    edit1.SetFocus;
-   end;
-end;
-
-procedure TForm1.Button3Click(Sender: TObject);
+procedure TForm1.replyButtonClick(Sender: TObject);
 var
   players:integer;
 
@@ -273,27 +264,15 @@ begin
   setupGame(self.ocaGame,players);
 
   timer1.Enabled:=true;
+
+  Self.setUiForReplyGame;
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
- shape1.Brush.Color:= ClYellow;
- shape2.Brush.Color:= clSkyBlue;
  shape3.Brush.Color:= RGB(255, 180, 0);
- shape4.Brush.Color:= clLtGray;
- shape5.Brush.Color:= clGray;
  shape6.Brush.Color:= clDkGray;
- shape7.Brush.Color:= clLime;
- shape8.Brush.Color:= clRed;
-
- label8.Caption := 'Casilla de la Oca';
- label9.Caption := 'Casilla Posada';
- label10.Caption:= 'Casilla Prision';
- label11.Caption:= 'Casilla Pozo';
- label12.Caption:= 'Casilla Laberinto';
- label13.Caption:= 'Casilla Muerte';
- label14.Caption:= 'Casilla Puente';
- label15.Caption:= 'Casilla Dados';
+ shape4.Brush.Color:= clLtGray;
 end;
 
 
@@ -303,12 +282,7 @@ begin
     if not(oca.game.ReplyGame(self.ocaGame)) then
       begin
         timer1.Enabled:=false;
-        gameGroupBox.Enabled := true;
-        Button2Click(Sender);
-        Button1.Enabled:=true;
-        Button2.Enabled:=true;
-        Button4.Enabled:=true;
-        button3.Enabled:=false;
+        Self.setUiForStartGame;
       end
     else
       begin
@@ -321,6 +295,57 @@ begin
   Self.justPaint := not Self.justPaint;
 
 
+end;
+
+procedure TForm1.setUiForEndGame;
+begin
+  Self.startButton.Enabled     := false;
+  Self.diceThrowButton.Enabled := false;
+  Self.toManualButton.Enabled  := false;
+  Self.toNormalButton.Enabled  := false;
+  Self.replyButton.Enabled     := true;
+  Self.playersComboBox.Enabled := false;
+
+end;
+
+procedure TForm1.setUiForInGame;
+begin
+  Self.startButton.Enabled     := false;
+  Self.diceThrowButton.Enabled := true;
+  Self.replyButton.Enabled     := false;
+  Self.playersComboBox.Enabled := false;
+  Self.setUiForNormalGame;
+end;
+
+procedure TForm1.setUiForManualGame;
+begin
+  Self.toManualButton.Enabled  := false;
+  Self.toNormalButton.Enabled  := true;
+end;
+
+procedure TForm1.setUiForNormalGame;
+begin
+  Self.toManualButton.Enabled  := true;
+  Self.toNormalButton.Enabled  := false;
+end;
+
+procedure TForm1.setUiForReplyGame;
+begin
+  Self.startButton.Enabled     := false;
+  Self.diceThrowButton.Enabled := false;
+  Self.toManualButton.Enabled  := false;
+  Self.toNormalButton.Enabled  := false;
+  Self.replyButton.Enabled     := false;
+  Self.playersComboBox.Enabled := false;
+end;
+
+procedure TForm1.setUiForStartGame;
+begin
+  Self.startButton.Enabled     := true;
+  Self.diceThrowButton.Enabled := false;
+  Self.replyButton.Enabled     := false;
+  Self.playersComboBox.Enabled := true;
+  Self.setUiForNormalGame;
 end;
 
 end.
