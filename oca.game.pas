@@ -57,7 +57,7 @@ type
 
   procedure playerReactToCell (var this : tOcaGame; player : integer);
   function currentPlayerWon   (var this: tOcaGame) : boolean;
-
+  Function ReplyGame (var this:tOcaGame):boolean;
 implementation
 
 procedure create (var this : tOcaGame);
@@ -510,6 +510,27 @@ var
 begin
   current := currentPlayerInfo(this);
   currentPlayerWon := current.currentCell = oca.space.last(this.data.path);
+end;
+
+Function ReplyGame (var this:tOcaGame):boolean;
+var
+  dice,player:integer;
+  aux: tOcaMovement;
+  keepPlaying:boolean;
+begin
+  keepPlaying:=not(oca.movements.isEmpty(this.data.movements));
+
+  If keepPlaying then
+   begin
+    aux:=oca.movements.dequeue(this.data.movements);
+    player:=aux.player;
+    dice  :=aux.dice;
+    oca.game.applyPlayerMovement(this,player,dice);
+   end;
+  ReplyGame:=KeepPlaying;
+
+
+
 end;
 
 end.

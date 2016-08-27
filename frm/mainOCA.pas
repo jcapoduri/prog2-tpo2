@@ -5,7 +5,8 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Grids,
-  oca.game, oca.modifiers, Buttons, StdCtrls;
+  oca.game, oca.modifiers, Buttons, StdCtrls,
+  ExtCtrls;
 
 type
   TForm1 = class(TForm)
@@ -24,13 +25,45 @@ type
     diceThrowButton: TButton;
     Label4: TLabel;
     infoLabel: TLabel;
+    GroupBox1: TGroupBox;
+    Button1: TButton;
+    Button2: TButton;
+    Button4: TButton;
+    Edit1: TEdit;
+    Label5: TLabel;
+    Shape1: TShape;
+    Shape2: TShape;
+    Shape3: TShape;
+    Shape4: TShape;
+    Shape5: TShape;
+    Shape6: TShape;
+    Shape7: TShape;
+    Shape8: TShape;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
+    Label10: TLabel;
+    Label11: TLabel;
+    Label12: TLabel;
+    Label13: TLabel;
+    Label14: TLabel;
+    Label15: TLabel;
+    Timer1: TTimer;
     procedure startButtonClick(Sender: TObject);
     procedure diceThrowEvent(Sender: TObject);
     procedure renderTile(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
       State: TGridDrawState);
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure ReplyMovement(Sender: TObject);
   protected
     ocaGame   : oca.game.tOcaGame;
     gameReady : boolean;
+    justPaint : boolean;
     procedure updateUI();
     procedure renderMatrix();
     procedure processThrown();
@@ -62,11 +95,13 @@ begin
   inherited Create(owner);
   //if System.RandSeed = 0 then Randomize;
   Self.gameReady := false;
+  Self.justPaint := false;
 end;
 
 procedure TForm1.updateUI;
 begin
   Self.playerLabel.Caption := IntToStr(oca.game.currentPlayer(Self.ocaGame));
+  Self.Label5.Caption      := 'Jugador Actual:' + IntToStr(oca.game.currentPlayer(self.ocaGame));
   Self.renderMatrix();
 end;
 
@@ -79,6 +114,8 @@ begin
   players := 2;
   if (Self.playersComboBox.Text = '3 Jugadores') then players := 3;
   if (Self.playersComboBox.Text = '4 Jugadores') then players := 4;
+  oca.game.create(Self.ocaGame);
+  oca.game.generate(Self.ocaGame);
   setupGame(Self.ocaGame, players);
   Self.gameReady := true;
   updateUI;
@@ -121,7 +158,15 @@ begin
     Death     : MessageDlg('Has caido en un casillero muerte, vuelves a empezar', mtInformation, [mbOk], 0);
   end;
   if oca.game.currentPlayerWon(Self.ocaGame) then
-    MessageDlg('Has ganado el juego de la oca!', mtInformation, [mbOk], 0)
+   begin
+    MessageDlg('Has ganado el juego de la oca!', mtInformation, [mbOk], 0);
+    diceThrowButton.Enabled:=false;
+    InGameGroupBox.Enabled := true;
+    Button1.Enabled:=False;
+    Button2.Enabled:=false;
+    Button4.Enabled:=false;
+    button3.Enabled:=true;
+   end
   else
     begin
       oca.game.playerReactToCell(Self.ocaGame, oca.game.currentPlayer(Self.ocaGame));
@@ -183,6 +228,99 @@ begin
     OutputDebugString('end.')
   end;
   end;//if
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+  InGameGroupBox.Enabled:=false;
+  GroupBox1.Enabled:=true;
+  edit1.SetFocus;
+
+end;
+
+procedure TForm1.Button2Click(Sender: TObject);
+begin
+  groupBox1.Enabled:=false;
+  InGameGroupBox.Enabled:=true
+end;
+
+procedure TForm1.Button4Click(Sender: TObject);
+var
+  dice, current:integer;
+
+begin
+  dice   :=StrToIntDef(edit1.Text, 0);
+  IF dice >0 then
+   begin
+    current:=oca.game.currentPlayer(self.ocaGame);
+    oca.game.movePlayer(self.ocaGame,current,dice);
+    self.updateUI;
+    self.processMovement;
+    edit1.SetFocus;
+   end;
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+var
+  players:integer;
+
+begin
+
+  if self.playersComboBox.Text='2 Jugadores' then players:=2;
+  if self.playersComboBox.Text='3 Jugadores' then players:=3;
+  if self.playersComboBox.Text='4 Jugadores' then players:=4;
+
+  setupGame(self.ocaGame,players);
+
+  timer1.Enabled:=true;
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+ shape1.Brush.Color:= ClYellow;
+ shape2.Brush.Color:= clSkyBlue;
+ shape3.Brush.Color:= RGB(255, 180, 0);
+ shape4.Brush.Color:= clLtGray;
+ shape5.Brush.Color:= clGray;
+ shape6.Brush.Color:= clDkGray;
+ shape7.Brush.Color:= clLime;
+ shape8.Brush.Color:= clRed;
+
+ label8.Caption := 'Casilla de la Oca';
+ label9.Caption := 'Casilla Posada';
+ label10.Caption:= 'Casilla Prision';
+ label11.Caption:= 'Casilla Pozo';
+ label12.Caption:= 'Casilla Laberinto';
+ label13.Caption:= 'Casilla Muerte';
+ label14.Caption:= 'Casilla Puente';
+ label15.Caption:= 'Casilla Dados';
+end;
+
+
+procedure TForm1.ReplyMovement(Sender: TObject);
+begin
+  if not Self.justPaint then
+    if not(oca.game.ReplyGame(self.ocaGame)) then
+      begin
+        timer1.Enabled:=false;
+        gameGroupBox.Enabled := true;
+        Button2Click(Sender);
+        Button1.Enabled:=true;
+        Button2.Enabled:=true;
+        Button4.Enabled:=true;
+        button3.Enabled:=false;
+      end
+    else
+      begin
+        UpdateUi;
+        oca.game.playerReactToCell(Self.ocaGame, oca.game.currentPlayer(Self.ocaGame));
+        oca.game.nextPlayer(Self.ocaGame);
+      end
+  else
+    UpdateUi;
+  Self.justPaint := not Self.justPaint;
+
+
 end;
 
 end.

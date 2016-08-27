@@ -130,7 +130,7 @@ var
   Rc : tControlRecord;
 begin
   Rc      := getControlRecord(this);
-  isEmpty := Rc.count = 0;
+  isEmpty := Rc.first = NULLIDX;
 end;
 
 function  length (var this : tQueueOcaMvmt) : integer;
@@ -292,7 +292,7 @@ begin
       auxPos  := Rc.last;
       auxItem := get(this, auxPos);
       auxItem.next := itemPos;
-      update(this, auxPos, item);
+      update(this, auxPos, auxItem);
       Rc.last := itemPos;
     end;
   setControlRecord(this, Rc);
@@ -311,9 +311,9 @@ begin
   auxItem := get(this, auxPos);
 
 
-  Rc.first := auxItem.next;
+  Rc.first     := auxItem.next;
   auxItem.next := Rc.erased;
-  auxItem.next := auxPos;
+  Rc.erased    := auxPos;
 
 
   update(this, auxPos, auxItem);
