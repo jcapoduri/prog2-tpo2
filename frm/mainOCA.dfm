@@ -102,7 +102,6 @@ object Form1: TForm1
     Width = 233
     Height = 153
     Caption = 'Juego'
-    Enabled = False
     TabOrder = 2
     object Label2: TLabel
       Left = 8
@@ -331,7 +330,7 @@ object Form1: TForm1
     Enabled = False
     Interval = 500
     OnTimer = ReplyMovement
-    Left = 760
-    Top = 480
+    Left = 512
+    Top = 488
   end
 end

@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   Dialogs, Grids,
-  oca.game, oca.modifiers, Buttons, StdCtrls,
+  oca.game, oca.modifiers, Buttons, StdCtrls, typinfo,
   ExtCtrls;
 
 type
@@ -119,7 +119,7 @@ var
 begin
   Self.gameReady := false;
   Self.playersComboBox.Enabled := false;
-  Self.startButton.Enabled     := true;
+  Self.startButton.Enabled     := false;
   players := 2;
   if (Self.playersComboBox.Text = '3 Jugadores') then players := 3;
   if (Self.playersComboBox.Text = '4 Jugadores') then players := 4;
@@ -160,6 +160,7 @@ var
   item    : tOcaCellInfo;
 begin
   item := oca.game.getCurrentPlayerCellInfo(Self.ocaGame);
+  Self.movementsText.Lines.Append('Jugador ' + Self.playerLabel.Caption + ' tirada: ' + Self.diceEdit.Text + ' casillero: ' + inttostr(item.cellNmb));
   case item.modifier of
     Goose     : MessageDlg('Has caido en un casillero de la oca, seguiras hasta la siguiente oca y tiras de nuevo', mtInformation, [mbOk], 0);
     Bridge    : MessageDlg('Has caido en un casillero puente, seguras trasladado al otro punte y tiras de nuevo', mtInformation, [mbOk], 0);
@@ -170,6 +171,8 @@ begin
     Labyrinth : MessageDlg('Has caido en un casillero laberinto, retrocedes al menos 12 casilleros hasta la siguiente posicion neutra', mtInformation, [mbOk], 0);
     Death     : MessageDlg('Has caido en un casillero muerte, vuelves a empezar', mtInformation, [mbOk], 0);
   end;
+  if item.modifier <> None then
+    Self.movementsText.Lines.Append('Cayo en casilla ' + GetEnumName(TypeInfo(tModifiers), Ord(item.modifier)));
   if oca.game.currentPlayerWon(Self.ocaGame) then
    begin
     MessageDlg('Has ganado el juego de la oca!', mtInformation, [mbOk], 0);

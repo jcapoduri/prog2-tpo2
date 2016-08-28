@@ -119,7 +119,7 @@ begin
   bridgesInserted := false;
   while not bridgesInserted do
     begin
-      cell1 := random(NMBSPACES - 7);
+      cell1 := random(NMBSPACES - 8) + 2;
       cell2 := cell1 + 6;
       if ( not oca.modifiers.existsCell(this.data.rules, cell1) ) and
          ( not oca.modifiers.existsCell(this.data.rules, cell2) ) then
@@ -143,7 +143,7 @@ begin
   while not dicesInserted do
     begin
       space := random(NMBSPACES - 21) + 20; //to have a random number upper than 20 but below NMBSPACES
-      cell1 := random(NMBSPACES - space);
+      cell1 := random(NMBSPACES - space) + 2;
       cell2 := cell1 + space;
       if ( not oca.modifiers.existsCell(this.data.rules, cell1) ) and
          ( not oca.modifiers.existsCell(this.data.rules, cell2) ) then
@@ -166,7 +166,7 @@ begin
   inserted := false;
   while not inserted do
     begin
-      cell := random(NMBSPACES - (lowerLimit + 1)) + lowerLimit;
+      cell := random(NMBSPACES - (lowerLimit + 2)) + lowerLimit + 2;
       if not oca.modifiers.existsCell(this.data.rules, cell) then
          begin
            item := oca.modifiers.generateModifier(this.data.rules, modifier, cell);
