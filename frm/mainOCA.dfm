@@ -219,7 +219,7 @@ object Form1: TForm1
     Top = 32
     Width = 145
     Height = 481
-    Enabled = False
+    ScrollBars = ssVertical
     TabOrder = 4
   end
   object mimicMovementsText: TMemo
@@ -227,6 +227,7 @@ object Form1: TForm1
     Top = 32
     Width = 145
     Height = 479
+    ScrollBars = ssVertical
     TabOrder = 5
   end
   object GroupBox1: TGroupBox
