@@ -50,6 +50,7 @@ type
   function  currentPlayer     (var this : tOcaGame) : integer;
   function  currentPlayerInfo (var this : tOcaGame) : tOcaPlayerInfo;
   function  nextPlayer        (var this: tOcaGame) : integer;
+  function  nextMovement      (var this: tOcaGame; var player : integer) : integer;
   function  getCellInfo       (var this: tOcaGame; number: integer) : tOcaCellInfo;
   function  getCurrentPlayerCellInfo (var this: tOcaGame) : tOcaCellInfo;
 
@@ -448,6 +449,20 @@ begin
 
   //apply movement
   applyPlayerMovement(this, player, movements);
+end;
+
+function  nextMovement (var this: tOcaGame; var player : integer) : integer;
+var
+  item : tOcaMovement;
+begin
+  player       := 0;
+  nextMovement := 0;
+  if not oca.movements.isEmpty(this.data.movements) then
+    begin
+      item         := oca.movements.peek(this.data.movements);
+      player       := item.player;
+      nextMovement := item.dice; 
+    end;  
 end;
 
 procedure playerReactToCell (var this : tOcaGame; player : integer);

@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 711
-  Top = 173
+  Left = 496
+  Top = 176
   Width = 1077
   Height = 560
   Caption = 'OCA'
@@ -100,7 +100,7 @@ object Form1: TForm1
     Left = 512
     Top = 96
     Width = 233
-    Height = 153
+    Height = 217
     Caption = 'Juego'
     TabOrder = 2
     object Label2: TLabel
@@ -120,7 +120,7 @@ object Form1: TForm1
     object playerLabel: TLabel
       Left = 88
       Top = 16
-      Width = 25
+      Width = 3
       Height = 13
     end
     object Label4: TLabel
@@ -156,7 +156,7 @@ object Form1: TForm1
     end
     object toManualButton: TButton
       Left = 128
-      Top = 88
+      Top = 96
       Width = 97
       Height = 25
       Caption = 'Modo Manual'
@@ -165,8 +165,8 @@ object Form1: TForm1
       OnClick = toManualButtonClick
     end
     object replyButton: TButton
-      Left = 112
-      Top = 120
+      Left = 8
+      Top = 136
       Width = 115
       Height = 25
       Caption = 'Replicar Juego actual'
@@ -176,13 +176,33 @@ object Form1: TForm1
     end
     object toNormalButton: TButton
       Left = 8
-      Top = 88
+      Top = 96
       Width = 97
       Height = 25
       Caption = 'Modo Normal'
       Enabled = False
       TabOrder = 4
       OnClick = toNormalButtonClick
+    end
+    object replyModeButton: TButton
+      Left = 8
+      Top = 184
+      Width = 113
+      Height = 25
+      Caption = 'Repetici'#243'n manual'
+      Enabled = False
+      TabOrder = 5
+      OnClick = replyModeButtonClick
+    end
+    object stepButton: TButton
+      Left = 128
+      Top = 184
+      Width = 97
+      Height = 25
+      Caption = 'Paso'
+      Enabled = False
+      TabOrder = 6
+      OnClick = ReplyMovement
     end
   end
   object BitBtn1: TBitBtn

@@ -51,6 +51,8 @@ type
     Label13: TLabel;
     Label14: TLabel;
     Label15: TLabel;
+    replyModeButton: TButton;
+    stepButton: TButton;
     procedure startButtonClick(Sender: TObject);
     procedure diceThrowEvent(Sender: TObject);
     procedure renderTile(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
@@ -60,6 +62,7 @@ type
     procedure replyButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ReplyMovement(Sender: TObject);
+    procedure replyModeButtonClick(Sender: TObject);
   protected
     ocaGame   : oca.game.tOcaGame;
     gameReady : boolean;
@@ -280,9 +283,13 @@ end;
 
 
 procedure TForm1.ReplyMovement(Sender: TObject);
-begin
+var 
+  movement, player : integer;
+  item    : tOcaCellInfo;
+begin  
+  movement := oca.game.nextMovement(Self.ocaGame, player);
   if not Self.justPaint then
-    if not(oca.game.ReplyGame(self.ocaGame)) then
+    if player = 0{not(oca.game.ReplyGame(self.ocaGame))} then
       begin
         timer1.Enabled:=false;
         Self.setUiForStartGame;
@@ -290,11 +297,19 @@ begin
     else
       begin
         UpdateUi;
-        oca.game.playerReactToCell(Self.ocaGame, oca.game.currentPlayer(Self.ocaGame));
-        oca.game.nextPlayer(Self.ocaGame);
+        oca.game.ReplyGame(self.ocaGame);
+        item := oca.game.getCurrentPlayerCellInfo(Self.ocaGame);
+        Self.mimicMovementsText.Lines.Append('Jugador ' + IntToStr(player) + ' tirada: ' +IntToStr(movement) + ' casillero: ' + inttostr(item.cellNmb));
       end
   else
-    UpdateUi;
+    begin
+      UpdateUi;
+      oca.game.playerReactToCell(Self.ocaGame, oca.game.currentPlayer(Self.ocaGame));
+      item := oca.game.getCurrentPlayerCellInfo(Self.ocaGame);
+      if item.modifier <> None then
+        Self.mimicMovementsText.Lines.Append('Cayo en casilla ' + GetEnumName(TypeInfo(tModifiers), Ord(item.modifier)));
+      oca.game.nextPlayer(Self.ocaGame);
+    end;
   Self.justPaint := not Self.justPaint;
 
 
@@ -307,6 +322,8 @@ begin
   Self.toManualButton.Enabled  := false;
   Self.toNormalButton.Enabled  := false;
   Self.replyButton.Enabled     := true;
+  Self.stepButton.Enabled      := false;
+  Self.replyModeButton.Enabled := false;
   Self.playersComboBox.Enabled := false;
 
 end;
@@ -317,6 +334,8 @@ begin
   Self.diceThrowButton.Enabled := true;
   Self.replyButton.Enabled     := false;
   Self.playersComboBox.Enabled := false;
+  Self.stepButton.Enabled      := false;
+  Self.replyModeButton.Enabled := false;
   Self.setUiForNormalGame;
 end;
 
@@ -340,6 +359,8 @@ begin
   Self.toNormalButton.Enabled  := false;
   Self.replyButton.Enabled     := false;
   Self.playersComboBox.Enabled := false;
+  Self.stepButton.Enabled      := false;
+  Self.replyModeButton.Enabled := true;
 end;
 
 procedure TForm1.setUiForStartGame;
@@ -349,6 +370,18 @@ begin
   Self.replyButton.Enabled     := false;
   Self.playersComboBox.Enabled := true;
   Self.setUiForNormalGame;
+  Self.stepButton.Enabled      := false;
+  Self.replyModeButton.Enabled := false;
+end;
+
+procedure TForm1.replyModeButtonClick(Sender: TObject);
+begin
+  Self.Timer1.enabled := not Self.Timer1.enabled;
+  if Self.Timer1.enabled then
+    Self.replyModeButton.Caption := 'Ir a repetición manual'
+  else
+    Self.replyModeButton.Caption := 'Ir a repetición automatica';
+  Self.stepButton.enabled := not Self.Timer1.enabled;
 end;
 
 end.

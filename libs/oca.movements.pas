@@ -37,6 +37,7 @@ type
 
   procedure queue         (var this : tQueueOcaMvmt; item : tOcaMovement);
   function  dequeue       (var this : tQueueOcaMvmt) : tOcaMovement;
+  function  peek          (var this : tQueueOcaMvmt) : tOcaMovement;
   function  createMovement(var this : tQueueOcaMvmt; player, movement : integer) : tOcaMovement;
 
   function  get           (var this : tQueueOcaMvmt; pos : idxRange) : tOcaMovement;
@@ -322,6 +323,20 @@ begin
 
   auxItem.next := NULLIDX;
   dequeue := auxItem;
+end;
+
+function  peek (var this : tQueueOcaMvmt) : tOcaMovement;
+var
+  Rc      : tControlRecord;
+  auxItem : tOcaMovement;
+  auxPos  : idxRange;
+begin
+  Rc      := getControlRecord(this);
+  auxPos  := Rc.first;
+  auxItem := get(this, auxPos);
+
+  auxItem.next := NULLIDX;
+  peek    := auxItem;
 end;
 
 function  createMovement(var this : tQueueOcaMvmt; player, movement : integer) : tOcaMovement;
