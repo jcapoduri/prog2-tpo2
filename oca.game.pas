@@ -50,6 +50,7 @@ type
   function  currentPlayer     (var this : tOcaGame) : integer;
   function  currentPlayerInfo (var this : tOcaGame) : tOcaPlayerInfo;
   function  nextPlayer        (var this: tOcaGame) : integer;
+  function  nextMovement      (var this: tOcaGame; var player : integer) : integer;
   function  getCellInfo       (var this: tOcaGame; number: integer) : tOcaCellInfo;
   function  getCurrentPlayerCellInfo (var this: tOcaGame) : tOcaCellInfo;
 
@@ -57,7 +58,7 @@ type
 
   procedure playerReactToCell (var this : tOcaGame; player : integer);
   function currentPlayerWon   (var this: tOcaGame) : boolean;
-
+  Function ReplyGame (var this:tOcaGame):boolean;
 implementation
 
 procedure create (var this : tOcaGame);
@@ -119,7 +120,7 @@ begin
   bridgesInserted := false;
   while not bridgesInserted do
     begin
-      cell1 := random(NMBSPACES - 7);
+      cell1 := random(NMBSPACES - 8) + 2;
       cell2 := cell1 + 6;
       if ( not oca.modifiers.existsCell(this.data.rules, cell1) ) and
          ( not oca.modifiers.existsCell(this.data.rules, cell2) ) then
@@ -143,7 +144,7 @@ begin
   while not dicesInserted do
     begin
       space := random(NMBSPACES - 21) + 20; //to have a random number upper than 20 but below NMBSPACES
-      cell1 := random(NMBSPACES - space);
+      cell1 := random(NMBSPACES - space) + 2;
       cell2 := cell1 + space;
       if ( not oca.modifiers.existsCell(this.data.rules, cell1) ) and
          ( not oca.modifiers.existsCell(this.data.rules, cell2) ) then
@@ -166,7 +167,7 @@ begin
   inserted := false;
   while not inserted do
     begin
-      cell := random(NMBSPACES - (lowerLimit + 1)) + lowerLimit;
+      cell := random(NMBSPACES - (lowerLimit + 2)) + lowerLimit + 2;
       if not oca.modifiers.existsCell(this.data.rules, cell) then
          begin
            item := oca.modifiers.generateModifier(this.data.rules, modifier, cell);
@@ -380,7 +381,10 @@ begin
   //keep going back until normal position found
   item := oca.space.get(this.data.path, player.currentCell);
   while oca.modifiers.search(this.data.rules, item.cell, modifier) do
+    begin
       player.currentCell := oca.space.prev(this.data.path, player.currentCell);
+      item := oca.space.get(this.data.path, player.currentCell);
+    end;
 
 end;
 
@@ -447,6 +451,20 @@ begin
   applyPlayerMovement(this, player, movements);
 end;
 
+function  nextMovement (var this: tOcaGame; var player : integer) : integer;
+var
+  item : tOcaMovement;
+begin
+  player       := 0;
+  nextMovement := 0;
+  if not oca.movements.isEmpty(this.data.movements) then
+    begin
+      item         := oca.movements.peek(this.data.movements);
+      player       := item.player;
+      nextMovement := item.dice; 
+    end;  
+end;
+
 procedure playerReactToCell (var this : tOcaGame; player : integer);
 var
   moveForward : boolean;
@@ -510,6 +528,27 @@ var
 begin
   current := currentPlayerInfo(this);
   currentPlayerWon := current.currentCell = oca.space.last(this.data.path);
+end;
+
+Function ReplyGame (var this:tOcaGame):boolean;
+var
+  dice,player:integer;
+  aux: tOcaMovement;
+  keepPlaying:boolean;
+begin
+  keepPlaying:=not(oca.movements.isEmpty(this.data.movements));
+
+  If keepPlaying then
+   begin
+    aux:=oca.movements.dequeue(this.data.movements);
+    player:=aux.player;
+    dice  :=aux.dice;
+    oca.game.applyPlayerMovement(this,player,dice);
+   end;
+  ReplyGame:=KeepPlaying;
+
+
+
 end;
 
 end.
